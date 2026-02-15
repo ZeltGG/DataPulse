@@ -1,0 +1,25 @@
+<h1>Contacto</h1>
+
+<form (ngSubmit)="submit()">
+  <div>
+    <label>Nombre</label><br />
+    <input [(ngModel)]="name" name="name" required />
+  </div>
+
+  <div>
+    <label>Email</label><br />
+    <input [(ngModel)]="email" name="email" type="email" required />
+  </div>
+
+  <div>
+    <label>Mensaje</label><br />
+    <textarea [(ngModel)]="message" name="message" rows="5" required></textarea>
+  </div>
+
+  <button type="submit" [disabled]="sending">
+    {{ sending ? 'Enviando...' : 'Enviar' }}
+  </button>
+</form>
+
+<p *ngIf="success">{{ success }}</p>
+<p *ngIf="error">{{ error }}</p>
