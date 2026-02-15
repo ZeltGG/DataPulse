@@ -1,0 +1,52 @@
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node / Angular
+/node_modules
+npm-debug.log
+yarn-error.log
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.cache/
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/
+.history/*
+
+# Miscellaneous
+.sass-cache/
+.connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+__screenshots__/
+.angular/cache
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Python / Django
+backend/.venv/
+backend/__pycache__/
+backend/**/*.pyc
+backend/db.sqlite3
+backend/.env
+backend/staticfiles/
+backend/media/
+
+# Django media/static
+backend/staticfiles/
+backend/media/
