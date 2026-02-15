@@ -19,14 +19,22 @@ export interface ContactMessageCreate {
   message: string;
 }
 
+export interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
-  getProjects(): Observable<Project[]> {
-    return this.http.get<Project[]>(`${this.baseUrl}/projects/`);
+  // DRF devuelve: { count, next, previous, results: [...] }
+  getProjects(): Observable<PaginatedResponse<Project>> {
+    return this.http.get<PaginatedResponse<Project>>(`${this.baseUrl}/projects/`);
   }
 
   createContactMessage(payload: ContactMessageCreate): Observable<any> {

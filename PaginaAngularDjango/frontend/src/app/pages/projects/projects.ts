@@ -18,8 +18,8 @@ export class ProjectsComponent implements OnInit {
 
   ngOnInit(): void {
     this.api.getProjects().subscribe({
-      next: (data) => {
-        this.projects = data;
+      next: (res) => {
+        this.projects = res.results;
         this.loading = false;
       },
       error: () => {
