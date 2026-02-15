@@ -1,5 +1,5 @@
 import json
-from urllib.request import urlopen, Request
+from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 
 from rest_framework import viewsets, permissions, status
@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .permissions import IsAdminRole, IsViewerOrAbove
 from .models import Project, ContactMessage, Pais, IndicadorEconomico, TipoCambio
 from .serializers import (
     ProjectSerializer,
@@ -29,15 +30,17 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
     serializer_class = ContactMessageSerializer
 
     def get_permissions(self):
+        # El formulario (Angular) debe poder crear sin login
         if self.action == "create":
             return [permissions.AllowAny()]
-        return [permissions.IsAdminUser()]
+        # El resto (listar/ver/borrar/editar) solo ADMIN (por rol)
+        return [IsAdminRole()]
 
 
 class PaisViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Pais.objects.filter(activo=True)
     serializer_class = PaisSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsViewerOrAbove]
     lookup_field = "codigo_iso"
 
     def get_queryset(self):
@@ -63,7 +66,10 @@ class PaisViewSet(viewsets.ReadOnlyModelViewSet):
     def tipo_cambio(self, request, codigo_iso=None):
         pais = self.get_object()
         fx = (
-            TipoCambio.objects.filter(moneda_origen=pais.moneda_codigo, moneda_destino="USD")
+            TipoCambio.objects.filter(
+                moneda_origen=pais.moneda_codigo,
+                moneda_destino="USD",
+            )
             .order_by("-fecha")
             .first()
         )
@@ -75,15 +81,13 @@ class PaisViewSet(viewsets.ReadOnlyModelViewSet):
 
 class SyncPaisesView(APIView):
     """
-    Admin-only: sincroniza países desde RestCountries.
+    Admin-only (por grupo ADMIN): sincroniza países desde RestCountries.
     POST /api/sync/paises/
     """
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsAdminRole]
 
-    # Países objetivo (los del PDF)
     ISO_CODES = ["CO", "BR", "MX", "AR", "CL", "PE", "EC", "BO", "PY", "UY"]
 
-    # Mapeo a tus regiones del modelo
     ANDINA = {"CO", "PE", "EC", "BO"}
     CONO_SUR = {"AR", "CL", "PY", "UY", "BR"}
     CENTROAMERICA = {"MX"}
