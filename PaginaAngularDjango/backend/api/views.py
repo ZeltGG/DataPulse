@@ -1,6 +1,11 @@
-from rest_framework import viewsets, permissions
+import json
+from urllib.request import urlopen, Request
+from urllib.error import URLError, HTTPError
+
+from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import Project, ContactMessage, Pais, IndicadorEconomico, TipoCambio
 from .serializers import (
@@ -57,7 +62,6 @@ class PaisViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True, methods=["get"], url_path="tipo-cambio")
     def tipo_cambio(self, request, codigo_iso=None):
         pais = self.get_object()
-        # último tipo de cambio por moneda del país hacia USD
         fx = (
             TipoCambio.objects.filter(moneda_origen=pais.moneda_codigo, moneda_destino="USD")
             .order_by("-fecha")
@@ -67,3 +71,115 @@ class PaisViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({"detail": "No hay tipo de cambio registrado."}, status=404)
         serializer = TipoCambioSerializer(fx)
         return Response(serializer.data)
+
+
+class SyncPaisesView(APIView):
+    """
+    Admin-only: sincroniza países desde RestCountries.
+    POST /api/sync/paises/
+    """
+    permission_classes = [permissions.IsAdminUser]
+
+    # Países objetivo (los del PDF)
+    ISO_CODES = ["CO", "BR", "MX", "AR", "CL", "PE", "EC", "BO", "PY", "UY"]
+
+    # Mapeo a tus regiones del modelo
+    ANDINA = {"CO", "PE", "EC", "BO"}
+    CONO_SUR = {"AR", "CL", "PY", "UY", "BR"}
+    CENTROAMERICA = {"MX"}
+    CARIBE = set()
+
+    def _map_region(self, iso: str) -> str:
+        iso = iso.upper()
+        if iso in self.ANDINA:
+            return "ANDINA"
+        if iso in self.CONO_SUR:
+            return "CONO_SUR"
+        if iso in self.CENTROAMERICA:
+            return "CENTROAMERICA"
+        if iso in self.CARIBE:
+            return "CARIBE"
+        return "ANDINA"
+
+    def post(self, request):
+        codes = ",".join([c.lower() for c in self.ISO_CODES])
+        url = f"https://restcountries.com/v3.1/alpha?codes={codes}"
+
+        try:
+            req = Request(url, headers={"User-Agent": "DataPulseDev/1.0"})
+            with urlopen(req, timeout=20) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+        except HTTPError as e:
+            return Response(
+                {"detail": f"RestCountries HTTPError: {e.code}"},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
+        except URLError as e:
+            return Response(
+                {"detail": f"RestCountries URLError: {str(e)}"},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
+        except Exception as e:
+            return Response(
+                {"detail": f"Error inesperado: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        created = 0
+        updated = 0
+        errors = []
+
+        for item in data:
+            try:
+                iso = (item.get("cca2") or "").upper()
+                if not iso:
+                    continue
+
+                nombre = (item.get("name") or {}).get("common", iso)
+
+                currencies = item.get("currencies") or {}
+                moneda_codigo = ""
+                moneda_nombre = ""
+                if currencies:
+                    moneda_codigo = list(currencies.keys())[0]
+                    moneda_nombre = currencies[moneda_codigo].get("name", moneda_codigo)
+
+                latlng = item.get("latlng") or [0.0, 0.0]
+                latitud = float(latlng[0]) if len(latlng) > 0 else 0.0
+                longitud = float(latlng[1]) if len(latlng) > 1 else 0.0
+
+                poblacion = int(item.get("population") or 0)
+
+                region = self._map_region(iso)
+
+                _, was_created = Pais.objects.update_or_create(
+                    codigo_iso=iso,
+                    defaults={
+                        "nombre": nombre,
+                        "moneda_codigo": moneda_codigo,
+                        "moneda_nombre": moneda_nombre,
+                        "region": region,
+                        "latitud": latitud,
+                        "longitud": longitud,
+                        "poblacion": poblacion,
+                        "activo": True,
+                    },
+                )
+
+                if was_created:
+                    created += 1
+                else:
+                    updated += 1
+
+            except Exception as e:
+                errors.append({"iso": item.get("cca2"), "error": str(e)})
+
+        return Response(
+            {
+                "detail": "Sync completado",
+                "created": created,
+                "updated": updated,
+                "errors": errors,
+            },
+            status=status.HTTP_200_OK,
+        )
