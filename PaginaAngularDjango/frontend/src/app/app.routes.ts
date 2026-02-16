@@ -3,12 +3,13 @@ import { ProjectsComponent } from './pages/projects/projects';
 import { ContactComponent } from './pages/contact/contact';
 import { LoginComponent } from './pages/login/login';
 import { PaisesComponent } from './pages/paises/paises';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'projects', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'projects', component: ProjectsComponent },
   { path: 'contact', component: ContactComponent },
-  { path: 'paises', component: PaisesComponent },
+  { path: 'paises', component: PaisesComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: 'projects' },
 ];

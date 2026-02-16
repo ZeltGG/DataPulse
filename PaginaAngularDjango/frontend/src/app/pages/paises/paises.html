@@ -1,10 +1,30 @@
 <h1>Países</h1>
 
+<div style="display:flex; gap: 8px; align-items:center; margin-bottom: 12px;">
+  <span>Región:</span>
+  <button (click)="setRegion('')" [disabled]="selectedRegion === ''">Todas</button>
+  <button *ngFor="let r of regions" (click)="setRegion(r)" [disabled]="selectedRegion === r">
+    {{ r }}
+  </button>
+</div>
+
 <p *ngIf="loading">Cargando...</p>
 <p *ngIf="error" style="color: red">{{ error }}</p>
 
-<ul *ngIf="!loading && !error">
-  <li *ngFor="let p of paises">
-    <strong>{{ p.codigo_iso }}</strong> - {{ p.nombre }} ({{ p.region }})
-  </li>
-</ul>
+<div *ngIf="!loading && !error">
+  <p>Total: {{ count }}</p>
+
+  <ul>
+    <li *ngFor="let p of paises">
+      <strong>{{ p.codigo_iso }}</strong> - {{ p.nombre }} ({{ p.region }})
+      |
+      <a [routerLink]="['/paises', p.codigo_iso]">Ver detalle</a>
+    </li>
+  </ul>
+
+  <div style="display:flex; gap: 8px; margin-top: 12px;">
+    <button (click)="prevPage()" [disabled]="!prev">Anterior</button>
+    <span>Página {{ page }}</span>
+    <button (click)="nextPage()" [disabled]="!next">Siguiente</button>
+  </div>
+</div>

@@ -50,9 +50,11 @@ export class AuthService {
 
   refresh(): Observable<{ access: string }> {
     const refresh = this.getRefreshToken();
-    return this.http.post<{ access: string }>(`${this.baseUrl}/auth/refresh/`, {
-      refresh,
-    });
+    if (!refresh) {
+      // esto hará que el interceptor haga logout limpio si llega aquí
+      return this.http.post<{ access: string }>(`${this.baseUrl}/auth/refresh/`, { refresh: '' });
+    }
+    return this.http.post<{ access: string }>(`${this.baseUrl}/auth/refresh/`, { refresh });
   }
 
   setAccessToken(access: string) {

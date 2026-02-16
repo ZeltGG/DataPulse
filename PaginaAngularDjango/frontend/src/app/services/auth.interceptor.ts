@@ -6,17 +6,18 @@ import {
   HttpRequest,
   HttpErrorResponse,
 } from '@angular/common/http';
-import { Observable, throwError, switchMap, catchError } from 'rxjs';
+import { Observable, BehaviorSubject, throwError } from 'rxjs';
+import { catchError, filter, switchMap, take, tap } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   private refreshing = false;
+  private refreshSubject = new BehaviorSubject<string | null>(null);
 
   constructor(private auth: AuthService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // No meter token en endpoints de auth
     const isAuthEndpoint =
       req.url.includes('/auth/login/') || req.url.includes('/auth/refresh/');
 
@@ -28,38 +29,52 @@ export class AuthInterceptor implements HttpInterceptor {
 
     return next.handle(authReq).pipe(
       catchError((err: unknown) => {
-        // Si no es HttpErrorResponse, re-lanzar
         if (!(err instanceof HttpErrorResponse)) return throwError(() => err);
 
-        // Si 401 y tenemos refresh, intentar refresh 1 vez
+        // solo intentamos refresh si es 401, no es endpoint de auth, y hay refresh token
         if (err.status === 401 && !isAuthEndpoint && this.auth.getRefreshToken()) {
-          if (this.refreshing) {
-            // Si ya hay refresh en curso, no spamear
-            return throwError(() => err);
-          }
-
-          this.refreshing = true;
-
-          return this.auth.refresh().pipe(
-            switchMap((res) => {
-              this.refreshing = false;
-              this.auth.setAccessToken(res.access);
-
-              const retryReq = req.clone({
-                setHeaders: { Authorization: `Bearer ${res.access}` },
-              });
-
-              return next.handle(retryReq);
-            }),
-            catchError((e) => {
-              this.refreshing = false;
-              this.auth.logout();
-              return throwError(() => e);
-            })
-          );
+          return this.handle401(req, next);
         }
 
         return throwError(() => err);
+      })
+    );
+  }
+
+  private handle401(req: HttpRequest<any>, next: HttpHandler) {
+    // Si ya está refrescando, esperar a que llegue el nuevo access
+    if (this.refreshing) {
+      return this.refreshSubject.pipe(
+        filter((t): t is string => !!t),
+        take(1),
+        switchMap((newAccess) => {
+          const retryReq = req.clone({
+            setHeaders: { Authorization: `Bearer ${newAccess}` },
+          });
+          return next.handle(retryReq);
+        })
+      );
+    }
+
+    this.refreshing = true;
+    this.refreshSubject.next(null);
+
+    return this.auth.refresh().pipe(
+      tap((res) => {
+        this.auth.setAccessToken(res.access);
+        this.refreshing = false;
+        this.refreshSubject.next(res.access);
+      }),
+      switchMap((res) => {
+        const retryReq = req.clone({
+          setHeaders: { Authorization: `Bearer ${res.access}` },
+        });
+        return next.handle(retryReq);
+      }),
+      catchError((e) => {
+        this.refreshing = false;
+        this.auth.logout();
+        return throwError(() => e);
       })
     );
   }

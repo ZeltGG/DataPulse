@@ -1,0 +1,34 @@
+<p><a routerLink="/paises">← Volver</a></p>
+
+<h1>Detalle País: {{ codigo }}</h1>
+
+<p *ngIf="loading">Cargando...</p>
+<p *ngIf="error" style="color:red">{{ error }}</p>
+
+<div *ngIf="!loading && !error && pais">
+  <h2>{{ pais.nombre }}</h2>
+  <p><b>Región:</b> {{ pais.region }}</p>
+  <p><b>Moneda:</b> {{ pais.moneda_codigo }} - {{ pais.moneda_nombre }}</p>
+  <p><b>Población:</b> {{ pais.poblacion }}</p>
+  <p><b>Coordenadas:</b> {{ pais.latitud }}, {{ pais.longitud }}</p>
+
+  <hr />
+
+  <h3>Tipo de cambio (→ USD)</h3>
+  <p *ngIf="!tipoCambio">No hay tipo de cambio.</p>
+  <div *ngIf="tipoCambio">
+    <p><b>Tasa:</b> {{ tipoCambio.tasa }}</p>
+    <p><b>Fecha:</b> {{ tipoCambio.fecha }}</p>
+    <p><b>Fuente:</b> {{ tipoCambio.fuente }}</p>
+  </div>
+
+  <hr />
+
+  <h3>Indicadores</h3>
+  <p *ngIf="indicadores.length === 0">No hay indicadores.</p>
+  <ul *ngIf="indicadores.length > 0">
+    <li *ngFor="let i of indicadores">
+      <b>{{ i.tipo }}</b> - {{ i.valor }} ({{ i.unidad }}) - {{ i.anio }}
+    </li>
+  </ul>
+</div>
