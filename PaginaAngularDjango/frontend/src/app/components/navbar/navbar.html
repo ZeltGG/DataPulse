@@ -1,0 +1,11 @@
+<nav style="display:flex; gap:12px; align-items:center; padding:10px; border-bottom:1px solid #ddd;">
+    <a routerLink="/projects">Projects</a>
+    <a routerLink="/contact">Contact</a>
+  
+    <a *ngIf="auth.hasAccessToken()" routerLink="/paises">Países</a>
+  
+    <span style="flex:1"></span>
+  
+    <a *ngIf="!auth.hasAccessToken()" routerLink="/login">Login</a>
+    <button *ngIf="auth.hasAccessToken()" (click)="logout()">Logout</button>
+  </nav>

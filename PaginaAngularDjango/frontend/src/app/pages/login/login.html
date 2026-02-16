@@ -1,17 +1,31 @@
 <h1>Login</h1>
 
-<form (ngSubmit)="submit()">
+<form (ngSubmit)="submit()" #f="ngForm">
   <div>
     <label>Usuario</label><br />
-    <input name="username" [(ngModel)]="username" required />
+    <input
+      name="username"
+      [(ngModel)]="username"
+      required
+      autocomplete="username"
+    />
+    <small style="display:block; opacity:.8;">
+      Usa el <b>username</b> (ej: viewer1), no el email.
+    </small>
   </div>
 
   <div style="margin-top: 8px">
     <label>Contraseña</label><br />
-    <input name="password" type="password" [(ngModel)]="password" required />
+    <input
+      name="password"
+      type="password"
+      [(ngModel)]="password"
+      required
+      autocomplete="current-password"
+    />
   </div>
 
-  <button style="margin-top: 12px" type="submit" [disabled]="loading">
+  <button style="margin-top: 12px" type="submit" [disabled]="loading || f.invalid">
     {{ loading ? 'Entrando...' : 'Entrar' }}
   </button>
 
