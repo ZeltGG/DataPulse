@@ -21,7 +21,7 @@ export class LoginComponent {
   error = '';
 
   constructor(private auth: AuthService, private router: Router) {
-    // opcional: si ya hay token, no tiene sentido estar en login
+    
     if (this.auth.hasAccessToken()) {
       this.router.navigateByUrl('/paises');
     }
