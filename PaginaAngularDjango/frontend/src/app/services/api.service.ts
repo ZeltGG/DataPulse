@@ -103,4 +103,7 @@ export class ApiService {
   getPaisTipoCambio(codigoISO: string): Observable<TipoCambio> {
     return this.http.get<TipoCambio>(`${this.baseUrl}/paises/${codigoISO}/tipo-cambio/`);
   }
+  syncPaises(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/sync/paises/`, {});
+  }
 }

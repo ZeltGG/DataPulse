@@ -1,71 +1,97 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { ApiService, Pais, Region } from '../../services/api.service';
 
 @Component({
   selector: 'app-paises',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './paises.html',
   styleUrl: './paises.css',
 })
 export class PaisesComponent implements OnInit {
+  // data
   paises: Pais[] = [];
+  filtered: Pais[] = [];
+
+  // ui state
   loading = true;
   error = '';
 
-  // filtro/paginación
-  regions: Region[] = ['ANDINA', 'CONO_SUR', 'CENTROAMERICA', 'CARIBE'];
-  selectedRegion: Region | '' = '';
+  // filters
+  region: Region | '' = '';
+  search = '';
+
+  // pagination (DRF)
   page = 1;
   count = 0;
   next: string | null = null;
-  prev: string | null = null;
+  previous: string | null = null;
 
   constructor(private api: ApiService) {}
 
   ngOnInit(): void {
-    this.load();
+    this.load(1);
   }
 
-  load(): void {
+  load(page = 1): void {
     this.loading = true;
     this.error = '';
 
-    this.api.getPaises({
-      region: this.selectedRegion || undefined,
-      page: this.page,
-    }).subscribe({
-      next: (res) => {
-        this.paises = res.results;
-        this.count = res.count;
-        this.next = res.next;
-        this.prev = res.previous;
-        this.loading = false;
-      },
-      error: () => {
-        this.error = 'No se pudieron cargar los países.';
-        this.loading = false;
-      },
+    this.api
+      .getPaises({
+        region: this.region === '' ? undefined : (this.region as Region),
+        page,
+      })
+      .subscribe({
+        next: (res) => {
+          this.paises = res.results;
+          this.count = res.count;
+          this.next = res.next;
+          this.previous = res.previous;
+          this.page = page;
+
+          this.applyFilters();
+          this.loading = false;
+        },
+        error: () => {
+          this.error = 'No se pudieron cargar los países.';
+          this.loading = false;
+        },
+      });
+  }
+
+  applyFilters(): void {
+    const q = this.search.trim().toLowerCase();
+
+    if (!q) {
+      this.filtered = [...this.paises];
+      return;
+    }
+
+    this.filtered = this.paises.filter((p) => {
+      return (
+        p.nombre.toLowerCase().includes(q) ||
+        p.codigo_iso.toLowerCase().includes(q) ||
+        p.moneda_codigo.toLowerCase().includes(q)
+      );
     });
   }
 
-  setRegion(region: Region | ''): void {
-    this.selectedRegion = region;
-    this.page = 1;
-    this.load();
+  onRegionChange(value: Region | ''): void {
+    this.region = value;
+    this.load(1);
   }
 
-  nextPage(): void {
+  goPrev(): void {
+    if (!this.previous) return;
+    this.load(this.page - 1);
+  }
+
+  goNext(): void {
     if (!this.next) return;
-    this.page += 1;
-    this.load();
-  }
-
-  prevPage(): void {
-    if (!this.prev) return;
-    this.page = Math.max(1, this.page - 1);
-    this.load();
+    this.load(this.page + 1);
   }
 }

@@ -21,7 +21,7 @@ export class LoginComponent {
   error = '';
 
   constructor(private auth: AuthService, private router: Router) {
-    // opcional: si ya hay sesión, saca de login
+    // opcional: si ya hay token, no tiene sentido estar en login
     if (this.auth.hasAccessToken()) {
       this.router.navigateByUrl('/paises');
     }
@@ -44,7 +44,13 @@ export class LoginComponent {
       .login(username, password)
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
-        next: () => this.router.navigateByUrl('/paises'),
+        next: () => {
+          // importante para roles: cachea /auth/me/
+          this.auth.me().subscribe({
+            next: () => this.router.navigateByUrl('/paises'),
+            error: () => this.router.navigateByUrl('/paises'),
+          });
+        },
         error: (err: unknown) => {
           if (err instanceof HttpErrorResponse) {
             if (err.status === 401) {

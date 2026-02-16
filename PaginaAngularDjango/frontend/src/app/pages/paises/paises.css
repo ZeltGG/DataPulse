@@ -1,0 +1,43 @@
+.toolbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin: 12px 0;
+  }
+  
+  .search {
+    padding: 6px 8px;
+    min-width: 260px;
+  }
+  
+  .select {
+    padding: 6px 8px;
+  }
+  
+  .count {
+    margin-left: auto;
+    opacity: 0.8;
+  }
+  
+  .error {
+    color: red;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+  }
+  
+  .table th,
+  .table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  .pager {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 12px;
+  }

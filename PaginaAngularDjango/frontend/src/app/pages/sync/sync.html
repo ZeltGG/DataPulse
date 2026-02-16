@@ -1,0 +1,11 @@
+<h1>Sync Países (ADMIN)</h1>
+
+<button (click)="runSync()" [disabled]="loading">
+  {{ loading ? 'Sincronizando...' : 'Ejecutar Sync' }}
+</button>
+
+<p *ngIf="error" style="color:red; margin-top:10px;">{{ error }}</p>
+
+<pre *ngIf="result" style="margin-top:10px; background:#f6f6f6; padding:10px; border:1px solid #ddd;">
+{{ result | json }}
+</pre>

@@ -1,30 +1,55 @@
 <h1>Países</h1>
 
-<div style="display:flex; gap: 8px; align-items:center; margin-bottom: 12px;">
-  <span>Región:</span>
-  <button (click)="setRegion('')" [disabled]="selectedRegion === ''">Todas</button>
-  <button *ngFor="let r of regions" (click)="setRegion(r)" [disabled]="selectedRegion === r">
-    {{ r }}
-  </button>
+<div class="toolbar">
+  <input
+    class="search"
+    placeholder="Buscar por nombre, ISO o moneda..."
+    [(ngModel)]="search"
+    (ngModelChange)="applyFilters()"
+  />
+
+  <select class="select" [ngModel]="region" (ngModelChange)="onRegionChange($event)">
+    <option value="">Todas las regiones</option>
+    <option value="ANDINA">ANDINA</option>
+    <option value="CONO_SUR">CONO_SUR</option>
+    <option value="CENTROAMERICA">CENTROAMERICA</option>
+    <option value="CARIBE">CARIBE</option>
+  </select>
+
+  <span class="count">Total: {{ count }}</span>
 </div>
 
 <p *ngIf="loading">Cargando...</p>
-<p *ngIf="error" style="color: red">{{ error }}</p>
+<p *ngIf="error" class="error">{{ error }}</p>
 
-<div *ngIf="!loading && !error">
-  <p>Total: {{ count }}</p>
+<table *ngIf="!loading && !error" class="table">
+  <thead>
+    <tr>
+      <th>ISO</th>
+      <th>Nombre</th>
+      <th>Región</th>
+      <th>Moneda</th>
+      <th>Población</th>
+      <th></th>
+    </tr>
+  </thead>
 
-  <ul>
-    <li *ngFor="let p of paises">
-      <strong>{{ p.codigo_iso }}</strong> - {{ p.nombre }} ({{ p.region }})
-      |
-      <a [routerLink]="['/paises', p.codigo_iso]">Ver detalle</a>
-    </li>
-  </ul>
+  <tbody>
+    <tr *ngFor="let p of filtered">
+      <td><b>{{ p.codigo_iso }}</b></td>
+      <td>{{ p.nombre }}</td>
+      <td>{{ p.region }}</td>
+      <td>{{ p.moneda_codigo }} - {{ p.moneda_nombre }}</td>
+      <td>{{ p.poblacion }}</td>
+      <td>
+        <a [routerLink]="['/paises', p.codigo_iso]">Ver detalle</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
-  <div style="display:flex; gap: 8px; margin-top: 12px;">
-    <button (click)="prevPage()" [disabled]="!prev">Anterior</button>
-    <span>Página {{ page }}</span>
-    <button (click)="nextPage()" [disabled]="!next">Siguiente</button>
-  </div>
+<div *ngIf="!loading && !error" class="pager">
+  <button (click)="goPrev()" [disabled]="!previous">Anterior</button>
+  <span>Página {{ page }}</span>
+  <button (click)="goNext()" [disabled]="!next">Siguiente</button>
 </div>
