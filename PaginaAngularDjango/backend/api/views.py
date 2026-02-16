@@ -6,6 +6,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 
 from .permissions import IsAdminRole, IsViewerOrAbove
 from .models import Project, ContactMessage, Pais, IndicadorEconomico, TipoCambio
@@ -186,4 +187,20 @@ class SyncPaisesView(APIView):
                 "errors": errors,
             },
             status=status.HTTP_200_OK,
+        )
+    
+class MeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        groups = list(user.groups.values_list("name", flat=True))
+        return Response(
+            {
+                "id": user.id,
+                "username": user.username,
+                "is_staff": user.is_staff,
+                "is_superuser": user.is_superuser,
+                "groups": groups,
+            }
         )
