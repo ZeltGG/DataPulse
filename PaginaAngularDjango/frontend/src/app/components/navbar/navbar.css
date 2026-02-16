@@ -1,0 +1,13 @@
+.nav {
+    display: flex;
+    gap: 12px;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    align-items: center;
+  }
+  .spacer {
+    flex: 1;
+  }
+  button {
+    cursor: pointer;
+  }

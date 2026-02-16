@@ -1,34 +1,98 @@
-<p><a routerLink="/paises">← Volver</a></p>
+<a class="back" routerLink="/paises">← Volver a países</a>
 
-<h1>Detalle País: {{ codigo }}</h1>
+<h1>Detalle País: {{ codigoISO }}</h1>
 
 <p *ngIf="loading">Cargando...</p>
-<p *ngIf="error" style="color:red">{{ error }}</p>
+<p *ngIf="error" class="error">{{ error }}</p>
 
-<div *ngIf="!loading && !error && pais">
-  <h2>{{ pais.nombre }}</h2>
-  <p><b>Región:</b> {{ pais.region }}</p>
-  <p><b>Moneda:</b> {{ pais.moneda_codigo }} - {{ pais.moneda_nombre }}</p>
-  <p><b>Población:</b> {{ pais.poblacion }}</p>
-  <p><b>Coordenadas:</b> {{ pais.latitud }}, {{ pais.longitud }}</p>
+<div *ngIf="!loading && !error && pais" class="grid">
+  <!-- Card: info país -->
+  <section class="card">
+    <h2>{{ pais.nombre }}</h2>
 
-  <hr />
+    <div class="row">
+      <span class="label">Región</span>
+      <span class="value">{{ pais.region }}</span>
+    </div>
 
-  <h3>Tipo de cambio (→ USD)</h3>
-  <p *ngIf="!tipoCambio">No hay tipo de cambio.</p>
-  <div *ngIf="tipoCambio">
-    <p><b>Tasa:</b> {{ tipoCambio.tasa }}</p>
-    <p><b>Fecha:</b> {{ tipoCambio.fecha }}</p>
-    <p><b>Fuente:</b> {{ tipoCambio.fuente }}</p>
-  </div>
+    <div class="row">
+      <span class="label">Moneda</span>
+      <span class="value">{{ pais.moneda_codigo }} - {{ pais.moneda_nombre }}</span>
+    </div>
 
-  <hr />
+    <div class="row">
+      <span class="label">Población</span>
+      <span class="value">{{ formatNumber(pais.poblacion) }}</span>
+    </div>
 
-  <h3>Indicadores</h3>
-  <p *ngIf="indicadores.length === 0">No hay indicadores.</p>
-  <ul *ngIf="indicadores.length > 0">
-    <li *ngFor="let i of indicadores">
-      <b>{{ i.tipo }}</b> - {{ i.valor }} ({{ i.unidad }}) - {{ i.anio }}
-    </li>
-  </ul>
+    <div class="row">
+      <span class="label">Coordenadas</span>
+      <span class="value">{{ pais.latitud }}, {{ pais.longitud }}</span>
+    </div>
+  </section>
+
+  <!-- Card: tipo de cambio -->
+  <section class="card" *ngIf="tipoCambio as fx; else noFx">
+    <h2>Tipo de cambio ({{ fx.moneda_origen }} → {{ fx.moneda_destino }})</h2>
+  
+    <div class="row">
+      <span class="label">Tasa</span>
+      <span class="value">{{ fx.tasa }}</span>
+    </div>
+  
+    <div class="row">
+      <span class="label">Fecha</span>
+      <span class="value">{{ fx.fecha }}</span>
+    </div>
+  
+    <div class="row">
+      <span class="label">Variación %</span>
+      <span class="value">{{ fx.variacion_porcentual }}</span>
+    </div>
+  
+    <div class="row">
+      <span class="label">Fuente</span>
+      <span class="value">{{ fx.fuente }}</span>
+    </div>
+  </section>
+  
+  <ng-template #noFx>
+    <section class="card">
+      <h2>Tipo de cambio</h2>
+      <p>No hay tipo de cambio registrado para este país.</p>
+    </section>
+  </ng-template>
 </div>
+
+<!-- Indicadores -->
+<section *ngIf="!loading && !error" class="card full">
+  <h2>Indicadores económicos</h2>
+
+  <p *ngIf="indicadores.length === 0" class="muted">
+    No hay indicadores registrados para este país.
+  </p>
+
+  <table *ngIf="indicadores.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Año</th>
+        <th>Tipo</th>
+        <th>Valor</th>
+        <th>Unidad</th>
+        <th>Fuente</th>
+        <th>Actualización</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let i of indicadores">
+        <td><b>{{ i.anio }}</b></td>
+        <td>{{ i.tipo }}</td>
+        <td>{{ i.valor }}</td>
+        <td>{{ i.unidad }}</td>
+        <td>{{ i.fuente }}</td>
+        <td>{{ i.fecha_actualizacion }}</td>
+      </tr>
+    </tbody>
+  </table>
+</section>

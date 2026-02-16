@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { ApiService, Pais, IndicadorEconomico, TipoCambio } from '../../services/api.service';
 
 @Component({
@@ -11,7 +12,8 @@ import { ApiService, Pais, IndicadorEconomico, TipoCambio } from '../../services
   styleUrl: './pais-detail.css',
 })
 export class PaisDetailComponent implements OnInit {
-  codigo = '';
+  codigoISO = '';
+
   loading = true;
   error = '';
 
@@ -22,7 +24,7 @@ export class PaisDetailComponent implements OnInit {
   constructor(private route: ActivatedRoute, private api: ApiService) {}
 
   ngOnInit(): void {
-    this.codigo = (this.route.snapshot.paramMap.get('codigo') || '').toUpperCase();
+    this.codigoISO = (this.route.snapshot.paramMap.get('codigo') || '').toUpperCase();
     this.load();
   }
 
@@ -30,27 +32,35 @@ export class PaisDetailComponent implements OnInit {
     this.loading = true;
     this.error = '';
 
-    this.api.getPais(this.codigo).subscribe({
-      next: (pais) => {
+    forkJoin({
+      pais: this.api.getPais(this.codigoISO),
+      indicadores: this.api.getPaisIndicadores(this.codigoISO),
+      tipoCambio: this.api.getPaisTipoCambio(this.codigoISO),
+    }).subscribe({
+      next: ({ pais, indicadores, tipoCambio }) => {
         this.pais = pais;
 
-        // cargar extras en paralelo simple
-        this.api.getPaisIndicadores(this.codigo).subscribe({
-          next: (data) => (this.indicadores = data),
-          error: () => (this.indicadores = []),
-        });
+        // ordenar indicadores (más nuevo arriba)
+        this.indicadores = [...(indicadores || [])].sort((a, b) => b.anio - a.anio);
 
-        this.api.getPaisTipoCambio(this.codigo).subscribe({
-          next: (fx) => (this.tipoCambio = fx),
-          error: () => (this.tipoCambio = null),
-        });
-
+        this.tipoCambio = tipoCambio;
         this.loading = false;
       },
-      error: () => {
-        this.error = 'No se pudo cargar el país.';
+      error: (e) => {
+        console.error('Pais detail error', e);
+        this.error =
+          e?.error?.detail ||
+          'No se pudo cargar el detalle del país. Revisa el backend o permisos.';
         this.loading = false;
       },
     });
+  }
+
+  formatNumber(n: number): string {
+    try {
+      return new Intl.NumberFormat('es-CO').format(n);
+    } catch {
+      return String(n);
+    }
   }
 }

@@ -1,0 +1,73 @@
+.back {
+    display: inline-block;
+    margin-bottom: 10px;
+    text-decoration: none;
+  }
+  
+  .error {
+    color: red;
+  }
+  
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 12px 0;
+  }
+  
+  .card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 12px;
+    background: #fff;
+  }
+  
+  .card h2 {
+    margin: 0 0 10px 0;
+  }
+  
+  .full {
+    margin-top: 14px;
+  }
+  
+  .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    border-bottom: 1px dashed #eee;
+  }
+  
+  .row:last-child {
+    border-bottom: none;
+  }
+  
+  .label {
+    opacity: 0.7;
+  }
+  
+  .value {
+    font-weight: 600;
+  }
+  
+  .muted {
+    opacity: 0.75;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+  }
+  
+  .table th,
+  .table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }

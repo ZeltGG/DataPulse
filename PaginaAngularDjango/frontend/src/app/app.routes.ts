@@ -9,6 +9,7 @@ import { SyncComponent } from './pages/sync/sync';
 
 
 
+
 export const routes: Routes = [
   { path: '', redirectTo: 'projects', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -16,7 +17,6 @@ export const routes: Routes = [
   { path: 'contact', component: ContactComponent },
   { path: 'paises', component: PaisesComponent, canActivate: [authGuard] },
   { path: 'sync', component: SyncComponent, canActivate: [authGuard] },
+  { path: 'paises/:codigo', component: PaisDetailComponent, canActivate: [authGuard], data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN']} },
   { path: '**', redirectTo: 'projects' },
-  { path: 'paises/:codigo', component: PaisDetailComponent, canActivate: [authGuard] },
-  
 ];
