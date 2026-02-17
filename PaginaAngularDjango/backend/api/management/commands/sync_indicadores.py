@@ -1,29 +1,19 @@
-from datetime import datetime
-
 from django.core.management.base import BaseCommand
 
-from api.models import IndicadorEconomico, Pais
+from api.models import Pais
+from api.views import recalculate_all_risks, sync_exchange_rates, sync_world_bank_indicators
 
 
 class Command(BaseCommand):
-    help = 'Sincroniza (mock) indicadores economicos para paises activos.'
+    help = 'Sincroniza indicadores economicos reales + tipo de cambio y recalcula IRPC.'
 
     def handle(self, *args, **options):
-        year = datetime.utcnow().year
-        total = 0
-        for pais in Pais.objects.filter(activo=True):
-            payloads = [
-                ('PIB', 100 + pais.id * 3, 'USD_MILES_MILLONES'),
-                ('INFLACION', 2 + (pais.id % 7), 'PORCENTAJE'),
-                ('DESEMPLEO', 4 + (pais.id % 6), 'PORCENTAJE'),
-                ('DEUDA_PIB', 25 + (pais.id % 10) * 3, 'PORCENTAJE'),
-            ]
-            for tipo, valor, unidad in payloads:
-                IndicadorEconomico.objects.update_or_create(
-                    pais=pais,
-                    tipo=tipo,
-                    anio=year,
-                    defaults={'valor': valor, 'unidad': unidad, 'fuente': 'MANUAL'},
-                )
-                total += 1
-        self.stdout.write(self.style.SUCCESS(f'Indicadores sincronizados: {total}'))
+        iso_codes = list(Pais.objects.filter(activo=True).values_list('codigo_iso', flat=True))
+        wb = sync_world_bank_indicators(iso_codes)
+        fx = sync_exchange_rates()
+        risk = recalculate_all_risks()
+        self.stdout.write(self.style.SUCCESS(f'WorldBank created={wb[\"created\"]} updated={wb[\"updated\"]}'))
+        self.stdout.write(self.style.SUCCESS(f'FX updated={fx[\"updated\"]} alerts={fx[\"alerts\"]}'))
+        self.stdout.write(self.style.SUCCESS(f'Riesgo updated={risk[\"updated\"]}'))
+        if wb['errors'] or fx['errors']:
+            self.stdout.write(self.style.WARNING(f'Errores WB={len(wb[\"errors\"])} FX={len(fx[\"errors\"])}'))

@@ -24,6 +24,11 @@ class Pais(models.Model):
 
     class Meta:
         ordering = ['nombre']
+        indexes = [
+            models.Index(fields=['codigo_iso']),
+            models.Index(fields=['region']),
+            models.Index(fields=['nombre']),
+        ]
 
     def __str__(self) -> str:
         return f'{self.nombre} ({self.codigo_iso})'
@@ -60,6 +65,10 @@ class IndicadorEconomico(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['pais', 'tipo', 'anio'], name='uniq_indicador_pais_tipo_anio'),
         ]
+        indexes = [
+            models.Index(fields=['pais', 'tipo', 'anio']),
+            models.Index(fields=['tipo', 'anio']),
+        ]
 
     def __str__(self) -> str:
         return f'{self.pais.codigo_iso} {self.tipo} {self.anio}'
@@ -77,6 +86,9 @@ class TipoCambio(models.Model):
         ordering = ['-fecha']
         constraints = [
             models.UniqueConstraint(fields=['moneda_origen', 'moneda_destino', 'fecha'], name='uniq_fx_pair_fecha'),
+        ]
+        indexes = [
+            models.Index(fields=['moneda_origen', 'fecha']),
         ]
 
     def __str__(self) -> str:
@@ -102,6 +114,11 @@ class Portafolio(models.Model):
         ordering = ['-created_at']
         constraints = [
             models.UniqueConstraint(fields=['owner', 'nombre'], name='uniq_owner_portafolio_nombre_activo'),
+        ]
+        indexes = [
+            models.Index(fields=['owner', 'activo']),
+            models.Index(fields=['es_publico', 'activo']),
+            models.Index(fields=['nombre']),
         ]
 
     def __str__(self) -> str:
@@ -143,6 +160,10 @@ class Posicion(models.Model):
                 name='posicion_fecha_salida_gt_entrada',
             )
         ]
+        indexes = [
+            models.Index(fields=['portafolio', 'pais', 'tipo_activo']),
+            models.Index(fields=['fecha_salida']),
+        ]
 
     def save(self, *args, **kwargs):
         if self.monto_inversion_usd <= 0 and self.cantidad > 0 and self.precio_unitario > 0:
@@ -175,6 +196,10 @@ class IndiceRiesgo(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['pais', 'fecha_calculo'], name='uniq_riesgo_pais_fecha')
         ]
+        indexes = [
+            models.Index(fields=['pais', 'fecha_calculo']),
+            models.Index(fields=['indice_compuesto']),
+        ]
 
 
 class Alerta(models.Model):
@@ -199,6 +224,11 @@ class Alerta(models.Model):
 
     class Meta:
         ordering = ['-fecha_creacion']
+        indexes = [
+            models.Index(fields=['usuario', 'leida']),
+            models.Index(fields=['tipo_alerta', 'severidad']),
+            models.Index(fields=['fecha_creacion']),
+        ]
 
 
 class LogActividad(models.Model):
@@ -220,3 +250,7 @@ class LogActividad(models.Model):
 
     class Meta:
         ordering = ['-fecha']
+        indexes = [
+            models.Index(fields=['usuario', 'fecha']),
+            models.Index(fields=['accion', 'fecha']),
+        ]

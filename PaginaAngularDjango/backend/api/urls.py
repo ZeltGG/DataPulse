@@ -4,7 +4,9 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .views import (
     AlertaViewSet,
+    DashboardMapaView,
     DashboardResumenView,
+    DashboardTendenciasView,
     MeView,
     PaisViewSet,
     PortafolioViewSet,
@@ -34,5 +36,7 @@ urlpatterns = [
     path('riesgo/<str:codigo_iso>/', RiesgoDetailView.as_view(), name='riesgo-detail'),
     path('riesgo/<str:codigo_iso>/historico/', RiesgoHistoricoView.as_view(), name='riesgo-historico'),
     path('dashboard/resumen/', DashboardResumenView.as_view(), name='dashboard-resumen'),
+    path('dashboard/mapa/', DashboardMapaView.as_view(), name='dashboard-mapa'),
+    path('dashboard/tendencias/', DashboardTendenciasView.as_view(), name='dashboard-tendencias'),
     path('', include(router.urls)),
 ]
