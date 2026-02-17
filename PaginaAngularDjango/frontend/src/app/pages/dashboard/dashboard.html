@@ -3,7 +3,7 @@
 <p *ngIf="loading">Cargando...</p>
 <p *ngIf="error" class="error">{{ error }}</p>
 
-<div *ngIf="resumen && !loading" class="kpis">
+<div *ngIf="resumen" class="kpis">
   <mat-card>
     <h3>Paises</h3>
     <p>{{ resumen.kpis.total_paises }}</p>
@@ -22,19 +22,19 @@
   </mat-card>
 </div>
 
-<mat-card *ngIf="!loading" style="margin-bottom: 16px;">
+<mat-card style="margin-bottom: 16px;">
   <h2>Mapa de Riesgo Latam</h2>
   <div id="latam-map" class="map"></div>
   <p *ngIf="!mapa.length">No hay datos de riesgo para mostrar en el mapa.</p>
 </mat-card>
 
-<mat-card *ngIf="!loading" style="margin-bottom: 16px;">
+<mat-card style="margin-bottom: 16px;">
   <h2>Ranking IRPC</h2>
   <canvas id="riesgo-chart"></canvas>
   <p *ngIf="!resumen?.ranking?.length">No hay ranking disponible.</p>
 </mat-card>
 
-<mat-card *ngIf="!loading" style="margin-bottom: 16px;">
+<mat-card style="margin-bottom: 16px;">
   <h2>Tendencias (ultimos 5 anos)</h2>
   <div class="trend-filters">
     <label>
@@ -58,7 +58,7 @@
   <p *ngIf="!tendencias?.series?.length">No hay series disponibles para esta combinacion.</p>
 </mat-card>
 
-<table *ngIf="resumen && !loading" class="table">
+<table *ngIf="resumen" class="table">
   <thead>
     <tr>
       <th>Pais</th>

@@ -48,7 +48,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.api.getDashboardResumen().subscribe({
       next: (res) => {
         this.resumen = res;
-        this.renderRankingChart();
+        setTimeout(() => this.renderRankingChart(), 0);
       },
       error: () => {
         this.error = 'No se pudo cargar el resumen del dashboard.';
@@ -58,7 +58,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.api.getDashboardMapa().subscribe({
       next: (res) => {
         this.mapa = res;
-        this.renderMap();
+        setTimeout(() => {
+          this.initMap();
+          this.renderMap();
+        }, 0);
         this.loading = false;
       },
       error: () => {
@@ -74,7 +77,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.api.getDashboardTendencias(this.tipoSeleccionado, this.paisesSeleccionados).subscribe({
       next: (res) => {
         this.tendencias = res;
-        this.renderTrendChart();
+        setTimeout(() => this.renderTrendChart(), 0);
       },
       error: () => {
         this.error = 'No se pudo cargar las tendencias.';
