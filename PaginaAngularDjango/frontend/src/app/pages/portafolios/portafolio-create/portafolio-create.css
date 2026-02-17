@@ -1,0 +1,24 @@
+.form {
+    max-width: 520px;
+    display: grid;
+    gap: 12px;
+  }
+  
+  input,
+  textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+  }
+  
+  button {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #111;
+    background: transparent;
+  }
+  
+  .error {
+    color: red;
+  }

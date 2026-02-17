@@ -1,56 +1,118 @@
-import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
-import { catchError, map, of } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, of, tap, catchError, map } from 'rxjs';
+import { environment } from '../../environments/environment';
 
-export const authGuard: CanActivateFn = (route) => {
-  const auth = inject(AuthService);
-  const router = inject(Router);
+export interface TokenPair {
+  access: string;
+  refresh: string;
+}
 
-  // Roles opcionales definidos en la ruta
-  const allowed: string[] = (route.data?.['roles'] as string[]) ?? [];
+export interface MeResponse {
+  id: number;
+  username: string;
+  is_staff: boolean;
+  is_superuser: boolean;
+  groups: string[];
+}
 
-  // 1) Si no hay token -> login
-  if (!auth.hasAccessToken()) {
-    router.navigateByUrl('/login');
-    return false;
+@Injectable({ providedIn: 'root' })
+export class authGuard {
+  private readonly baseUrl = environment.apiUrl;
+  private readonly ACCESS_KEY = 'dp_access';
+  private readonly REFRESH_KEY = 'dp_refresh';
+
+  
+  private loggedIn$ = new BehaviorSubject<boolean>(this.hasAccessToken());
+
+  
+  private me$ = new BehaviorSubject<MeResponse | null>(null);
+
+  constructor(private http: HttpClient) {}
+
+
+  isLoggedIn(): Observable<boolean> {
+    return this.loggedIn$.asObservable();
   }
 
-  // 2) Si ya tenemos el usuario cargado (me), decidir rápido
-  const me = auth.getMeSnapshot?.() ? auth.getMeSnapshot() : null;
-
-  if (me) {
-    // Si no se piden roles, basta estar logueado
-    if (allowed.length === 0) return true;
-
-    // Superuser pasa todo
-    if (me.is_superuser) return true;
-
-    const groups = me.groups ?? [];
-    const ok = allowed.some((r) => groups.includes(r));
-    if (!ok) router.navigateByUrl('/paises');
-    return ok;
+  hasAccessToken(): boolean {
+    return !!localStorage.getItem(this.ACCESS_KEY);
   }
 
-  // 3) Si no hay "me" aún, pedir /auth/me y decidir
-  return auth.initSession().pipe(
-    map((meRes) => {
-      if (!meRes) {
-        router.navigateByUrl('/login');
-        return false;
-      }
+  getAccessToken(): string | null {
+    return localStorage.getItem(this.ACCESS_KEY);
+  }
 
-      if (allowed.length === 0) return true;
-      if (meRes.is_superuser) return true;
+  getRefreshToken(): string | null {
+    return localStorage.getItem(this.REFRESH_KEY);
+  }
 
-      const groups = meRes.groups ?? [];
-      const ok = allowed.some((r) => groups.includes(r));
-      if (!ok) router.navigateByUrl('/paises');
-      return ok;
-    }),
-    catchError(() => {
-      router.navigateByUrl('/login');
-      return of(false);
-    })
-  );
-};
+ 
+  getMeSnapshot(): MeResponse | null {
+    return this.me$.value;
+  }
+
+  
+  meChanges(): Observable<MeResponse | null> {
+    return this.me$.asObservable();
+  }
+
+ 
+  login(username: string, password: string): Observable<TokenPair> {
+    return this.http
+      .post<TokenPair>(`${this.baseUrl}/auth/login/`, { username, password })
+      .pipe(
+        tap((tokens) => {
+          localStorage.setItem(this.ACCESS_KEY, tokens.access);
+          localStorage.setItem(this.REFRESH_KEY, tokens.refresh);
+          this.loggedIn$.next(true);
+        }),
+        
+        tap(() => {
+          this.fetchMe().subscribe();
+        })
+      );
+  }
+
+  refresh(): Observable<{ access: string }> {
+    const refresh = this.getRefreshToken();
+    return this.http.post<{ access: string }>(`${this.baseUrl}/auth/refresh/`, {
+      refresh,
+    });
+  }
+
+  setAccessToken(access: string) {
+    localStorage.setItem(this.ACCESS_KEY, access);
+  }
+
+  logout(): void {
+    localStorage.removeItem(this.ACCESS_KEY);
+    localStorage.removeItem(this.REFRESH_KEY);
+    this.me$.next(null);
+    this.loggedIn$.next(false);
+  }
+
+ 
+  fetchMe(): Observable<MeResponse | null> {
+    if (!this.hasAccessToken()) {
+      this.me$.next(null);
+      return of(null);
+    }
+
+    return this.http.get<MeResponse>(`${this.baseUrl}/auth/me/`).pipe(
+      tap((me) => this.me$.next(me)),
+      map((me) => me),
+      catchError(() => {
+      
+        this.logout();
+        return of(null);
+      })
+    );
+  }
+
+  initSession(): Observable<MeResponse | null> {
+    const cached = this.getMeSnapshot();
+    if (cached) return of(cached);
+    return this.fetchMe();
+  }
+}

@@ -1,0 +1,16 @@
+<a routerLink="/portafolios">← Volver</a>
+
+<p *ngIf="loading">Cargando...</p>
+<p *ngIf="error" class="error">{{ error }}</p>
+
+<div *ngIf="!loading && !error && item" class="card">
+  <h1>{{ item.nombre }}</h1>
+  <p class="desc">{{ item.descripcion }}</p>
+
+  <hr />
+
+  <h2>Posiciones</h2>
+  <p class="muted">
+    (Si tu backend aún no devuelve posiciones aquí, en el siguiente paso las conectamos)
+  </p>
+</div>

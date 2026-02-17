@@ -1,0 +1,19 @@
+<h1>Crear Portafolio</h1>
+
+<form (ngSubmit)="submit()" class="form">
+  <label>
+    Nombre
+    <input name="nombre" [(ngModel)]="nombre" required />
+  </label>
+
+  <label>
+    Descripción
+    <textarea name="descripcion" [(ngModel)]="descripcion" rows="4" required></textarea>
+  </label>
+
+  <button type="submit" [disabled]="loading">
+    {{ loading ? 'Creando...' : 'Crear' }}
+  </button>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+</form>

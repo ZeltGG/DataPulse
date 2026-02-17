@@ -8,7 +8,7 @@ export interface TokenPair {
   refresh: string;
 }
 
-export interface MeResponse {
+export interface Me {
   id: number;
   username: string;
   is_staff: boolean;
@@ -23,21 +23,13 @@ export class AuthService {
   private readonly REFRESH_KEY = 'dp_refresh';
 
   private loggedIn$ = new BehaviorSubject<boolean>(this.hasAccessToken());
-  private me$ = new BehaviorSubject<MeResponse | null>(null);
+  private me$ = new BehaviorSubject<Me | null>(null);
 
   constructor(private http: HttpClient) {}
 
-  // ---------------- state ----------------
+  // ---- auth state ----
   isLoggedIn(): Observable<boolean> {
     return this.loggedIn$.asObservable();
-  }
-
-  me(): Observable<MeResponse | null> {
-    return this.me$.asObservable();
-  }
-
-  getMeSnapshot(): MeResponse | null {
-    return this.me$.value;
   }
 
   hasAccessToken(): boolean {
@@ -52,41 +44,41 @@ export class AuthService {
     return localStorage.getItem(this.REFRESH_KEY);
   }
 
-  // Helpers de rol
-  hasRole(role: string): boolean {
-    const u = this.me$.value;
-    if (!u) return false;
-    if (u.is_superuser) return true;
-    return (u.groups || []).includes(role);
-  }
-
-  isAdmin(): boolean {
-    // si tu grupo se llama "ADMIN"
-    return this.hasRole('ADMIN') || this.getMeSnapshot()?.is_staff === true;
-  }
-
-  // Llamar al arrancar la app (si hay token) para “hidratar” roles
-  initSession(): Observable<MeResponse | null> {
+  // ---- me / session ----
+  initSession(): Observable<Me | null> {
+    // si no hay token, sesión inválida
     if (!this.hasAccessToken()) {
       this.me$.next(null);
       this.loggedIn$.next(false);
       return of(null);
     }
 
-    return this.http.get<MeResponse>(`${this.baseUrl}/auth/me/`).pipe(
+    return this.http.get<Me>(`${this.baseUrl}/auth/me/`).pipe(
       tap((me) => {
         this.me$.next(me);
         this.loggedIn$.next(true);
       }),
       catchError(() => {
-        // token inválido / expirado
+        // token malo/expirado o cualquier error -> logout “limpio”
         this.logout();
         return of(null);
       })
     );
   }
 
-  // ---------------- auth api ----------------
+  getMeSnapshot(): Me | null {
+    return this.me$.value;
+  }
+
+  hasAnyRole(roles: string[]): boolean {
+    const me = this.getMeSnapshot();
+    if (!me) return false;
+    if (me.is_superuser) return true;
+    const groups = me.groups ?? [];
+    return roles.some((r) => groups.includes(r));
+  }
+
+  // ---- auth api ----
   login(username: string, password: string): Observable<TokenPair> {
     return this.http
       .post<TokenPair>(`${this.baseUrl}/auth/login/`, { username, password })
@@ -96,8 +88,8 @@ export class AuthService {
           localStorage.setItem(this.REFRESH_KEY, tokens.refresh);
           this.loggedIn$.next(true);
         }),
-        // luego pedimos /me para conocer grupos/roles
-        // (esto evita que el navbar/guards dependan “a ciegas”)
+        // después de login, trae /me para roles/navbar
+        // (si falla, igual queda logueado pero sin roles cacheados)
         tap(() => {
           this.initSession().subscribe();
         })

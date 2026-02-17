@@ -1,0 +1,44 @@
+.actions {
+    margin: 12px 0 18px;
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: 10px 14px;
+    border: 1px solid #111;
+    text-decoration: none;
+    border-radius: 8px;
+  }
+  
+  .error {
+    color: red;
+  }
+  
+  .grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+  
+  .card {
+    display: block;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 14px;
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .card:hover {
+    border-color: #111;
+  }
+  
+  .desc {
+    opacity: 0.85;
+  }
+  
+  .link {
+    display: inline-block;
+    margin-top: 8px;
+    font-weight: 600;
+  }

@@ -127,10 +127,7 @@ class TipoCambio(models.Model):
    
 
 class Portafolio(models.Model):
-    """
-    Portafolio de inversiones. (Core del PDF)
-    Un portafolio tiene muchas posiciones.
-    """
+    
     nombre = models.CharField(max_length=120)
     descripcion = models.TextField(blank=True)
     owner = models.ForeignKey(
@@ -150,9 +147,7 @@ class Portafolio(models.Model):
 
 
 class Posicion(models.Model):
-    """
-    Posición dentro de un portafolio (activo financiero).
-    """
+   
     class TipoActivo(models.TextChoices):
         ACCION = "ACCION", "ACCION"
         BONO = "BONO", "BONO"
@@ -181,3 +176,5 @@ class Posicion(models.Model):
 
     def __str__(self) -> str:
         return f"{self.portafolio.nombre} - {self.activo}"
+    
+    

@@ -51,7 +51,7 @@ export interface IndicadorEconomico {
   anio: number;
   fuente: string;
   fecha_actualizacion: string;
-  pais: number; // o codigo si lo cambiaste en serializer
+  pais: number;
 }
 
 export interface TipoCambio {
@@ -62,6 +62,20 @@ export interface TipoCambio {
   fecha: string;
   variacion_porcentual: number;
   fuente: string;
+}
+
+// ---- Portafolios ----
+export interface Portafolio {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface PortafolioCreate {
+  nombre: string;
+  descripcion: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -86,7 +100,6 @@ export class ApiService {
 
     if (options?.region) params = params.set('region', options.region);
     if (options?.page) params = params.set('page', String(options.page));
-    // pageSize sólo sirve si tu backend lo permite por query; si no, ignóralo
     if (options?.pageSize) params = params.set('page_size', String(options.pageSize));
 
     return this.http.get<PaginatedResponse<Pais>>(`${this.baseUrl}/paises/`, { params });
@@ -103,7 +116,25 @@ export class ApiService {
   getPaisTipoCambio(codigoISO: string): Observable<TipoCambio> {
     return this.http.get<TipoCambio>(`${this.baseUrl}/paises/${codigoISO}/tipo-cambio/`);
   }
+
   syncPaises(): Observable<any> {
     return this.http.post(`${this.baseUrl}/sync/paises/`, {});
+  }
+
+  // ---- Portafolios ----
+  getPortafolios(): Observable<PaginatedResponse<Portafolio>> {
+    return this.http.get<PaginatedResponse<Portafolio>>(`${this.baseUrl}/portafolios/`);
+  }
+
+  getPortafolio(id: number): Observable<Portafolio> {
+    return this.http.get<Portafolio>(`${this.baseUrl}/portafolios/${id}/`);
+  }
+
+  createPortafolio(payload: PortafolioCreate): Observable<Portafolio> {
+    return this.http.post<Portafolio>(`${this.baseUrl}/portafolios/`, payload);
+  }
+
+  deletePortafolio(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/portafolios/${id}/`);
   }
 }

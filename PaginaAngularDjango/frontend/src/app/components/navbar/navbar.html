@@ -1,6 +1,7 @@
 <nav class="nav">
     <a routerLink="/projects">Projects</a>
     <a routerLink="/contact">Contact</a>
+    <a routerLink="/portafolios">Portafolios</a>
   
     <!-- Solo usuarios logueados -->
     <a *ngIf="auth.hasAccessToken()" routerLink="/paises">Países</a>

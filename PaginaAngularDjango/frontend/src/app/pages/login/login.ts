@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
+
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -21,7 +22,6 @@ export class LoginComponent {
   error = '';
 
   constructor(private auth: AuthService, private router: Router) {
-    
     if (this.auth.hasAccessToken()) {
       this.router.navigateByUrl('/paises');
     }
@@ -46,7 +46,7 @@ export class LoginComponent {
       .subscribe({
         next: () => {
           // importante para roles: cachea /auth/me/
-          this.auth.me().subscribe({
+          this.auth.initSession().subscribe({
             next: () => this.router.navigateByUrl('/paises'),
             error: () => this.router.navigateByUrl('/paises'),
           });

@@ -1,0 +1,18 @@
+<h1>Portafolios</h1>
+
+<div class="actions" *ngIf="canCreate">
+  <a class="btn" routerLink="/portafolios/new">+ Crear portafolio</a>
+</div>
+
+<p *ngIf="loading">Cargando...</p>
+<p *ngIf="error" class="error">{{ error }}</p>
+
+<div class="grid" *ngIf="!loading && !error">
+  <a class="card" *ngFor="let p of items" [routerLink]="['/portafolios', p.id]">
+    <h3>{{ p.nombre }}</h3>
+    <p class="desc">{{ p.descripcion }}</p>
+    <span class="link">Ver detalle →</span>
+  </a>
+
+  <p *ngIf="items.length === 0">No hay portafolios todavía.</p>
+</div>
