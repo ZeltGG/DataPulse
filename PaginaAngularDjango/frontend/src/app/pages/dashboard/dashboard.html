@@ -4,23 +4,33 @@
 <p *ngIf="error" class="error">{{ error }}</p>
 
 <div *ngIf="resumen && !loading" class="kpis">
-  <article>
+  <mat-card>
     <h3>Paises</h3>
     <p>{{ resumen.kpis.total_paises }}</p>
-  </article>
-  <article>
+  </mat-card>
+  <mat-card>
     <h3>Alertas activas</h3>
     <p>{{ resumen.kpis.alertas_activas }}</p>
-  </article>
-  <article>
+  </mat-card>
+  <mat-card>
     <h3>Mis portafolios</h3>
     <p>{{ resumen.kpis.portafolios_usuario }}</p>
-  </article>
-  <article>
+  </mat-card>
+  <mat-card>
     <h3>Promedio IRPC</h3>
     <p>{{ resumen.kpis.promedio_irpc }}</p>
-  </article>
+  </mat-card>
 </div>
+
+<mat-card *ngIf="!loading" style="margin-bottom: 16px;">
+  <h2>Mapa de Riesgo Latam</h2>
+  <div id="latam-map" class="map"></div>
+</mat-card>
+
+<mat-card *ngIf="!loading" style="margin-bottom: 16px;">
+  <h2>Ranking IRPC</h2>
+  <canvas id="riesgo-chart"></canvas>
+</mat-card>
 
 <table *ngIf="resumen && !loading" class="table">
   <thead>

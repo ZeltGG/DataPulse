@@ -1,15 +1,29 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSelectModule } from '@angular/material/select';
 
-import { ApiService, Pais, PosicionCreate } from '../../../services/api.service';
+import { ApiService, Pais } from '../../../services/api.service';
 
 @Component({
   selector: 'app-posicion-create',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatSelectModule,
+  ],
   templateUrl: './posicion-create.html',
   styleUrl: './posicion-create.css',
 })
@@ -17,22 +31,24 @@ export class PosicionCreateComponent implements OnInit {
   portafolioId = 0;
   paises: Pais[] = [];
 
-  form: PosicionCreate = {
-    pais: 0,
-    activo: '',
-    ticker: '',
-    tipo_activo: 'ACCION',
-    moneda: 'USD',
-    cantidad: 0,
-    precio_unitario: 0,
-    peso_porcentual: null,
-  };
+  form = this.fb.nonNullable.group({
+    pais: [0, [Validators.required]],
+    activo: ['', [Validators.required]],
+    ticker: [''],
+    tipo_activo: ['ACCION', [Validators.required]],
+    moneda: ['USD', [Validators.required]],
+    cantidad: [0, [Validators.required, Validators.min(0.0001)]],
+    precio_unitario: [0, [Validators.required, Validators.min(0.0001)]],
+    peso_porcentual: [null as number | null],
+    notas: ['', [Validators.maxLength(200)]],
+  });
 
   loading = false;
   loadingPaises = true;
   error = '';
 
   constructor(
+    private fb: FormBuilder,
     private api: ApiService,
     private route: ActivatedRoute,
     private router: Router
@@ -44,7 +60,7 @@ export class PosicionCreateComponent implements OnInit {
       next: (res) => {
         this.paises = res.results;
         if (this.paises.length) {
-          this.form.pais = this.paises[0].id;
+          this.form.patchValue({ pais: this.paises[0].id });
         }
         this.loadingPaises = false;
       },
@@ -62,18 +78,29 @@ export class PosicionCreateComponent implements OnInit {
       this.error = 'Portafolio invalido.';
       return;
     }
-    if (!this.form.pais || !this.form.activo.trim()) {
-      this.error = 'Completa los campos obligatorios.';
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
     this.loading = true;
 
+    const payload = this.form.getRawValue();
+    if (payload.tipo_activo === 'MONEDA') {
+      const pais = this.paises.find((p) => p.id === payload.pais);
+      if (pais?.moneda_codigo === 'USD') {
+        this.error = 'No se permite posicion MONEDA para pais con moneda USD.';
+        this.loading = false;
+        return;
+      }
+    }
+
     this.api
       .createPosicion(this.portafolioId, {
-        ...this.form,
-        activo: this.form.activo.trim(),
-        ticker: this.form.ticker.trim(),
+        ...payload,
+        activo: payload.activo.trim(),
+        ticker: payload.ticker.trim(),
       })
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({

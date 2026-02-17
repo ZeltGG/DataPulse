@@ -1,42 +1,56 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { finalize, switchMap } from 'rxjs';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+  ],
   templateUrl: './login.html',
   styleUrls: ['./login.css'],
 })
 export class LoginComponent {
-  username = '';
-  password = '';
-
   loading = false;
   error = '';
 
-  constructor(private auth: AuthService, private router: Router) {
+  form = this.fb.nonNullable.group({
+    username: ['', [Validators.required]],
+    password: ['', [Validators.required]],
+  });
+
+  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
     if (this.auth.hasAccessToken()) {
-      this.router.navigateByUrl('/paises');
+      this.router.navigateByUrl('/dashboard');
     }
   }
 
   submit(): void {
     this.error = '';
 
-    const username = this.username.trim();
-    const password = this.password.trim();
-
-    if (!username || !password) {
-      this.error = 'Completa usuario y contrasena.';
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
+
+    const username = this.form.getRawValue().username.trim();
+    const password = this.form.getRawValue().password.trim();
 
     this.loading = true;
 
@@ -47,7 +61,7 @@ export class LoginComponent {
         finalize(() => (this.loading = false))
       )
       .subscribe({
-        next: () => this.router.navigateByUrl('/paises'),
+        next: () => this.router.navigateByUrl('/dashboard'),
         error: (err: unknown) => {
           if (err instanceof HttpErrorResponse) {
             if (err.status === 401) {

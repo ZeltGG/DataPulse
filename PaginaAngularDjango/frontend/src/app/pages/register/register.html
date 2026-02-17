@@ -1,35 +1,37 @@
-<h1>Registro</h1>
+<mat-card>
+  <h1>Registro</h1>
 
-<a routerLink="/login">Ir a login</a>
+  <a routerLink="/login">Ir a login</a>
 
-<form (ngSubmit)="submit()" class="form">
-  <label>
-    Username
-    <input name="username" [(ngModel)]="username" required />
-  </label>
+  <form [formGroup]="form" (ngSubmit)="submit()" class="form">
+    <mat-form-field appearance="outline">
+      <mat-label>Username</mat-label>
+      <input matInput formControlName="username" />
+    </mat-form-field>
 
-  <label>
-    Email
-    <input name="email" type="email" [(ngModel)]="email" required />
-  </label>
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" />
+    </mat-form-field>
 
-  <label>
-    Password
-    <input name="password" type="password" [(ngModel)]="password" required />
-  </label>
+    <mat-form-field appearance="outline">
+      <mat-label>Password</mat-label>
+      <input matInput type="password" formControlName="password" />
+    </mat-form-field>
 
-  <label>
-    Rol
-    <select name="rol" [(ngModel)]="rol">
-      <option value="VIEWER">VIEWER</option>
-      <option value="ANALISTA">ANALISTA</option>
-      <option value="ADMIN">ADMIN</option>
-    </select>
-  </label>
+    <mat-form-field appearance="outline">
+      <mat-label>Rol</mat-label>
+      <mat-select formControlName="rol">
+        <mat-option value="VIEWER">VIEWER</mat-option>
+        <mat-option value="ANALISTA">ANALISTA</mat-option>
+        <mat-option value="ADMIN">ADMIN</mat-option>
+      </mat-select>
+    </mat-form-field>
 
-  <button type="submit" [disabled]="loading">
-    {{ loading ? 'Registrando...' : 'Registrar' }}
-  </button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="loading || form.invalid">
+      {{ loading ? 'Registrando...' : 'Registrar' }}
+    </button>
 
-  <p *ngIf="error" class="error">{{ error }}</p>
-</form>
+    <p *ngIf="error" class="error">{{ error }}</p>
+  </form>
+</mat-card>

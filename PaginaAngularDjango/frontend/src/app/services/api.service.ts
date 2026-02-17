@@ -10,22 +10,6 @@ export interface PaginatedResponse<T> {
   results: T[];
 }
 
-export interface Project {
-  id: number;
-  title: string;
-  description: string;
-  tech_stack: string;
-  repo_url: string;
-  live_url: string;
-  created_at: string;
-}
-
-export interface ContactMessageCreate {
-  name: string;
-  email: string;
-  message: string;
-}
-
 export type Region = 'ANDINA' | 'CONO_SUR' | 'CENTROAMERICA' | 'CARIBE';
 
 export interface Pais {
@@ -159,14 +143,6 @@ export class ApiService {
   private readonly baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
-
-  getProjects(): Observable<PaginatedResponse<Project>> {
-    return this.http.get<PaginatedResponse<Project>>(`${this.baseUrl}/projects/`);
-  }
-
-  createContactMessage(payload: ContactMessageCreate): Observable<unknown> {
-    return this.http.post(`${this.baseUrl}/contact-messages/`, payload);
-  }
 
   register(payload: { username: string; email: string; password: string; rol: 'ADMIN' | 'ANALISTA' | 'VIEWER' }): Observable<unknown> {
     return this.http.post(`${this.baseUrl}/auth/register/`, payload);

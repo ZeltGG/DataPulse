@@ -1,62 +1,73 @@
-<h1>Nueva Posicion</h1>
+<mat-card>
+  <h1>Nueva Posicion</h1>
 
-<a [routerLink]="['/portafolios', portafolioId]">Volver</a>
+  <a [routerLink]="['/portafolios', portafolioId]">Volver</a>
 
-<p *ngIf="loadingPaises">Cargando paises...</p>
-<p *ngIf="error" class="error">{{ error }}</p>
+  <p *ngIf="loadingPaises">Cargando paises...</p>
+  <p *ngIf="error" class="error">{{ error }}</p>
 
-<form *ngIf="!loadingPaises" (ngSubmit)="submit()" class="form">
-  <label>
-    Pais
-    <select name="pais" [(ngModel)]="form.pais" required>
-      <option *ngFor="let pais of paises" [ngValue]="pais.id">
-        {{ pais.nombre }} ({{ pais.codigo_iso }})
-      </option>
-    </select>
-  </label>
+  <form *ngIf="!loadingPaises" [formGroup]="form" (ngSubmit)="submit()" class="form">
+    <mat-form-field appearance="outline">
+      <mat-label>Pais</mat-label>
+      <mat-select formControlName="pais" required>
+        <mat-option *ngFor="let pais of paises" [value]="pais.id">
+          {{ pais.nombre }} ({{ pais.codigo_iso }})
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
-  <label>
-    Activo
-    <input name="activo" [(ngModel)]="form.activo" required />
-  </label>
+    <mat-form-field appearance="outline">
+      <mat-label>Activo</mat-label>
+      <input matInput formControlName="activo" required />
+    </mat-form-field>
 
-  <label>
-    Ticker
-    <input name="ticker" [(ngModel)]="form.ticker" />
-  </label>
+    <mat-form-field appearance="outline">
+      <mat-label>Ticker</mat-label>
+      <input matInput formControlName="ticker" />
+    </mat-form-field>
 
-  <label>
-    Tipo activo
-    <select name="tipo_activo" [(ngModel)]="form.tipo_activo">
-      <option value="ACCION">ACCION</option>
-      <option value="BONO">BONO</option>
-      <option value="ETF">ETF</option>
-      <option value="CRYPTO">CRYPTO</option>
-      <option value="OTRO">OTRO</option>
-    </select>
-  </label>
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo activo</mat-label>
+      <mat-select formControlName="tipo_activo">
+        <mat-option value="RENTA_FIJA">RENTA_FIJA</mat-option>
+        <mat-option value="RENTA_VARIABLE">RENTA_VARIABLE</mat-option>
+        <mat-option value="COMMODITIES">COMMODITIES</mat-option>
+        <mat-option value="MONEDA">MONEDA</mat-option>
+        <mat-option value="ACCION">ACCION</mat-option>
+        <mat-option value="BONO">BONO</mat-option>
+        <mat-option value="ETF">ETF</mat-option>
+        <mat-option value="CRYPTO">CRYPTO</mat-option>
+        <mat-option value="OTRO">OTRO</mat-option>
+      </mat-select>
+    </mat-form-field>
 
-  <label>
-    Moneda
-    <input name="moneda" [(ngModel)]="form.moneda" maxlength="3" />
-  </label>
+    <mat-form-field appearance="outline">
+      <mat-label>Moneda</mat-label>
+      <input matInput formControlName="moneda" maxlength="3" />
+    </mat-form-field>
 
-  <label>
-    Cantidad
-    <input name="cantidad" type="number" step="0.0001" [(ngModel)]="form.cantidad" required />
-  </label>
+    <mat-form-field appearance="outline">
+      <mat-label>Cantidad</mat-label>
+      <input matInput type="number" step="0.0001" formControlName="cantidad" required />
+    </mat-form-field>
 
-  <label>
-    Precio unitario
-    <input name="precio_unitario" type="number" step="0.0001" [(ngModel)]="form.precio_unitario" required />
-  </label>
+    <mat-form-field appearance="outline">
+      <mat-label>Precio unitario</mat-label>
+      <input matInput type="number" step="0.0001" formControlName="precio_unitario" required />
+    </mat-form-field>
 
-  <label>
-    Peso porcentual
-    <input name="peso_porcentual" type="number" step="0.01" [(ngModel)]="form.peso_porcentual" />
-  </label>
+    <mat-form-field appearance="outline">
+      <mat-label>Peso porcentual</mat-label>
+      <input matInput type="number" step="0.01" formControlName="peso_porcentual" />
+    </mat-form-field>
 
-  <button type="submit" [disabled]="loading">
-    {{ loading ? 'Guardando...' : 'Guardar posicion' }}
-  </button>
-</form>
+    <mat-form-field appearance="outline">
+      <mat-label>Notas</mat-label>
+      <textarea matInput formControlName="notas" rows="2"></textarea>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit" [disabled]="loading || form.invalid">
+      {{ loading ? 'Guardando...' : 'Guardar posicion' }}
+    </button>
+  </form>
+</mat-card>

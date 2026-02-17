@@ -13,20 +13,17 @@ from rest_framework.views import APIView
 
 from .models import (
     Alerta,
-    ContactMessage,
     IndicadorEconomico,
     IndiceRiesgo,
     LogActividad,
     Pais,
     Portafolio,
     Posicion,
-    Project,
     TipoCambio,
 )
 from .permissions import IsAdminRole, IsAnalystOrAdmin, IsViewerOrAbove
 from .serializers import (
     AlertaSerializer,
-    ContactMessageSerializer,
     IndicadorEconomicoSerializer,
     IndiceRiesgoSerializer,
     MeUpdateSerializer,
@@ -36,7 +33,6 @@ from .serializers import (
     PortafolioListSerializer,
     PortafolioWriteSerializer,
     PosicionSerializer,
-    ProjectSerializer,
     RegisterSerializer,
     TipoCambioSerializer,
 )
@@ -112,22 +108,6 @@ class RegisterView(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         return Response({'id': user.id, 'username': user.username, 'email': user.email}, status=status.HTTP_201_CREATED)
-
-
-class ProjectViewSet(viewsets.ModelViewSet):
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
-    permission_classes = [permissions.AllowAny]
-
-
-class ContactMessageViewSet(viewsets.ModelViewSet):
-    queryset = ContactMessage.objects.all()
-    serializer_class = ContactMessageSerializer
-
-    def get_permissions(self):
-        if self.action == 'create':
-            return [permissions.AllowAny()]
-        return [IsAdminRole()]
 
 
 class PaisViewSet(viewsets.ReadOnlyModelViewSet):

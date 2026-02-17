@@ -4,12 +4,10 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .views import (
     AlertaViewSet,
-    ContactMessageViewSet,
     DashboardResumenView,
     MeView,
     PaisViewSet,
     PortafolioViewSet,
-    ProjectViewSet,
     RegisterView,
     RiesgoCalcularView,
     RiesgoDetailView,
@@ -20,8 +18,6 @@ from .views import (
 )
 
 router = DefaultRouter()
-router.register(r'projects', ProjectViewSet, basename='project')
-router.register(r'contact-messages', ContactMessageViewSet, basename='contactmessage')
 router.register(r'paises', PaisViewSet, basename='pais')
 router.register(r'portafolios', PortafolioViewSet, basename='portafolio')
 router.register(r'alertas', AlertaViewSet, basename='alerta')

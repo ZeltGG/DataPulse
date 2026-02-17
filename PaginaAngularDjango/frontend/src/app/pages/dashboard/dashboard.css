@@ -5,10 +5,10 @@
   margin-bottom: 16px;
 }
 
-.kpis article {
-  border: 1px solid #ddd;
-  padding: 10px;
+.map {
+  height: 420px;
   border-radius: 8px;
+  overflow: hidden;
 }
 
 .table {

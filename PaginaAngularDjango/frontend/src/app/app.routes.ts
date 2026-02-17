@@ -1,63 +1,70 @@
 import { Routes } from '@angular/router';
-import { ProjectsComponent } from './pages/projects/projects';
-import { ContactComponent } from './pages/contact/contact';
-import { LoginComponent } from './pages/login/login';
-import { RegisterComponent } from './pages/register/register';
-import { PaisesComponent } from './pages/paises/paises';
 import { authGuard } from './guards/auth.guard';
-import { PaisDetailComponent } from './pages/pais-detail/pais-detail';
-import { SyncComponent } from './pages/sync/sync';
-import { PortafoliosComponent } from './pages/portafolios/portafolios';
-import { PortafolioDetailComponent } from './pages/portafolios/portafolio-detail/portafolio-detail';
-import { PortafolioCreateComponent } from './pages/portafolios/portafolio-create/portafolio-create';
-import { PosicionCreateComponent } from './pages/portafolios/posicion-create/posicion-create';
-import { DashboardComponent } from './pages/dashboard/dashboard';
-import { AlertasComponent } from './pages/alertas/alertas';
+import { roleGuard } from './guards/role.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
-  { path: 'projects', component: ProjectsComponent },
-  { path: 'contact', component: ContactComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard], data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN'] } },
-  { path: 'alertas', component: AlertasComponent, canActivate: [authGuard], data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN'] } },
-  { path: 'paises', component: PaisesComponent, canActivate: [authGuard], data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN'] } },
+  {
+    path: 'login',
+    loadComponent: () => import('./pages/login/login').then((m) => m.LoginComponent),
+  },
+  {
+    path: 'register',
+    loadComponent: () => import('./pages/register/register').then((m) => m.RegisterComponent),
+  },
+  {
+    path: 'dashboard',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN'] },
+    loadComponent: () => import('./pages/dashboard/dashboard').then((m) => m.DashboardComponent),
+  },
+  {
+    path: 'alertas',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN'] },
+    loadComponent: () => import('./pages/alertas/alertas').then((m) => m.AlertasComponent),
+  },
+  {
+    path: 'paises',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN'] },
+    loadComponent: () => import('./pages/paises/paises').then((m) => m.PaisesComponent),
+  },
   {
     path: 'paises/:codigo',
-    component: PaisDetailComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
     data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN'] },
+    loadComponent: () => import('./pages/pais-detail/pais-detail').then((m) => m.PaisDetailComponent),
   },
   {
     path: 'sync',
-    component: SyncComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN'] },
+    loadComponent: () => import('./pages/sync/sync').then((m) => m.SyncComponent),
   },
   {
     path: 'portafolios',
-    component: PortafoliosComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
     data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN'] },
+    loadComponent: () => import('./pages/portafolios/portafolios').then((m) => m.PortafoliosComponent),
   },
   {
     path: 'portafolios/new',
-    component: PortafolioCreateComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
     data: { roles: ['ANALISTA', 'ADMIN'] },
+    loadComponent: () => import('./pages/portafolios/portafolio-create/portafolio-create').then((m) => m.PortafolioCreateComponent),
   },
   {
     path: 'portafolios/:id',
-    component: PortafolioDetailComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
     data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN'] },
+    loadComponent: () => import('./pages/portafolios/portafolio-detail/portafolio-detail').then((m) => m.PortafolioDetailComponent),
   },
   {
     path: 'portafolios/:id/posiciones/new',
-    component: PosicionCreateComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
     data: { roles: ['ANALISTA', 'ADMIN'] },
+    loadComponent: () => import('./pages/portafolios/posicion-create/posicion-create').then((m) => m.PosicionCreateComponent),
   },
   { path: '**', redirectTo: 'dashboard' },
 ];

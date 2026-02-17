@@ -3,7 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { catchError, map, of } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
-export const authGuard: CanActivateFn = (route) => {
+export const authGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
@@ -12,15 +12,8 @@ export const authGuard: CanActivateFn = (route) => {
     return false;
   }
 
-  const allowedRoles = (route.data?.['roles'] as string[] | undefined) || [];
-  const me = auth.getMeSnapshot();
-
-  if (me) {
-    if (!allowedRoles.length || auth.hasRole(...allowedRoles)) {
-      return true;
-    }
-    router.navigateByUrl('/paises');
-    return false;
+  if (auth.getMeSnapshot()) {
+    return true;
   }
 
   return auth.initSession().pipe(
@@ -29,13 +22,7 @@ export const authGuard: CanActivateFn = (route) => {
         router.navigateByUrl('/login');
         return false;
       }
-
-      if (!allowedRoles.length || auth.hasRole(...allowedRoles)) {
-        return true;
-      }
-
-      router.navigateByUrl('/paises');
-      return false;
+      return true;
     }),
     catchError(() => {
       router.navigateByUrl('/login');
