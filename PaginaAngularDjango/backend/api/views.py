@@ -8,8 +8,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
-from .permissions import IsAdminRole, IsViewerOrAbove
-from .models import Project, ContactMessage, Pais, IndicadorEconomico, TipoCambio
+from .permissions import IsAdminRole, IsViewerOrAbove, IsAnalystOrAdmin
+from .models import (
+    Project,
+    ContactMessage,
+    Pais,
+    IndicadorEconomico,
+    TipoCambio,
+    Portafolio,
+    Posicion,
+)
 from .serializers import (
     ProjectSerializer,
     ContactMessageSerializer,
@@ -17,6 +25,10 @@ from .serializers import (
     PaisDetailSerializer,
     IndicadorEconomicoSerializer,
     TipoCambioSerializer,
+    PortafolioListSerializer,
+    PortafolioDetailSerializer,
+    PortafolioCreateSerializer,
+    PosicionSerializer,
 )
 
 
@@ -188,7 +200,8 @@ class SyncPaisesView(APIView):
             },
             status=status.HTTP_200_OK,
         )
-    
+
+
 class MeView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -204,3 +217,26 @@ class MeView(APIView):
                 "groups": groups,
             }
         )
+
+
+class PortafolioViewSet(viewsets.ModelViewSet):
+    queryset = Portafolio.objects.all()
+
+    def get_permissions(self):
+        # Leer: VIEWER o superior
+        if self.action in ["list", "retrieve"]:
+            return [IsViewerOrAbove()]
+        # Escribir: ANALISTA o superior
+        return [IsAnalystOrAdmin()]
+
+    def get_serializer_class(self):
+        # List: liviano
+        if self.action == "list":
+            return PortafolioListSerializer
+
+        # Create/Update: acepta posiciones anidadas
+        if self.action in ["create", "update", "partial_update"]:
+            return PortafolioCreateSerializer
+
+        # Retrieve: detalle con posiciones
+        return PortafolioDetailSerializer

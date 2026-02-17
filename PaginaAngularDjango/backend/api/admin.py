@@ -5,6 +5,8 @@ from .models import (
     Pais,
     IndicadorEconomico,
     TipoCambio,
+    Portafolio,
+    Posicion,
 )
 
 @admin.register(Project)
@@ -38,3 +40,13 @@ class TipoCambioAdmin(admin.ModelAdmin):
     search_fields = ("moneda_origen", "moneda_destino")
     list_filter = ("moneda_origen", "moneda_destino")
     ordering = ("-fecha",)
+
+@admin.register(Portafolio)
+class PortafolioAdmin(admin.ModelAdmin):
+    list_display = ("id",)  # ajusta campos reales
+    search_fields = ("id",)
+
+@admin.register(Posicion)
+class PosicionAdmin(admin.ModelAdmin):
+    list_display = ("id",)  # ajusta campos reales
+    search_fields = ("id",)

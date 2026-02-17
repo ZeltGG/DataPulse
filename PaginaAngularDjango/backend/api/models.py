@@ -1,4 +1,6 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.conf import settings
 
 
 class Project(models.Model):
@@ -121,3 +123,61 @@ class TipoCambio(models.Model):
 
     def __str__(self) -> str:
         return f"{self.moneda_origen}/{self.moneda_destino} {self.fecha}"
+    
+   
+
+class Portafolio(models.Model):
+    """
+    Portafolio de inversiones. (Core del PDF)
+    Un portafolio tiene muchas posiciones.
+    """
+    nombre = models.CharField(max_length=120)
+    descripcion = models.TextField(blank=True)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="portafolios",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return self.nombre
+
+
+class Posicion(models.Model):
+    """
+    Posición dentro de un portafolio (activo financiero).
+    """
+    class TipoActivo(models.TextChoices):
+        ACCION = "ACCION", "ACCION"
+        BONO = "BONO", "BONO"
+        ETF = "ETF", "ETF"
+        CRYPTO = "CRYPTO", "CRYPTO"
+        OTRO = "OTRO", "OTRO"
+
+    portafolio = models.ForeignKey(Portafolio, on_delete=models.CASCADE, related_name="posiciones")
+    pais = models.ForeignKey("Pais", on_delete=models.PROTECT, related_name="posiciones")
+
+    activo = models.CharField(max_length=120)        # nombre del activo
+    ticker = models.CharField(max_length=20, blank=True)
+    tipo_activo = models.CharField(max_length=20, choices=TipoActivo.choices, default=TipoActivo.ACCION)
+
+    moneda = models.CharField(max_length=3, default="USD")
+    cantidad = models.FloatField(default=0)
+    precio_unitario = models.FloatField(default=0)
+
+    # % dentro del portafolio (si lo manejas manual)
+    peso_porcentual = models.FloatField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.portafolio.nombre} - {self.activo}"
