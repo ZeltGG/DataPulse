@@ -25,11 +25,13 @@
 <mat-card *ngIf="!loading" style="margin-bottom: 16px;">
   <h2>Mapa de Riesgo Latam</h2>
   <div id="latam-map" class="map"></div>
+  <p *ngIf="!mapa.length">No hay datos de riesgo para mostrar en el mapa.</p>
 </mat-card>
 
 <mat-card *ngIf="!loading" style="margin-bottom: 16px;">
   <h2>Ranking IRPC</h2>
   <canvas id="riesgo-chart"></canvas>
+  <p *ngIf="!resumen?.ranking?.length">No hay ranking disponible.</p>
 </mat-card>
 
 <mat-card *ngIf="!loading" style="margin-bottom: 16px;">
@@ -53,6 +55,7 @@
     </div>
   </div>
   <canvas id="tendencias-chart"></canvas>
+  <p *ngIf="!tendencias?.series?.length">No hay series disponibles para esta combinacion.</p>
 </mat-card>
 
 <table *ngIf="resumen && !loading" class="table">

@@ -11,6 +11,10 @@
 
 .app-header {
   margin-bottom: 14px;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .app-header h1 {
@@ -24,8 +28,15 @@
   margin: 8px 0 0;
   color: var(--muted-fg);
   font-size: 0.96rem;
+  max-width: 650px;
 }
 
 .app-main {
   margin-top: 18px;
+}
+
+@media (max-width: 860px) {
+  .app-header {
+    display: block;
+  }
 }

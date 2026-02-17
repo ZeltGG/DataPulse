@@ -7,6 +7,10 @@
   border-radius: 12px;
   align-items: center;
   flex-wrap: wrap;
+  position: sticky;
+  top: 10px;
+  z-index: 40;
+  backdrop-filter: blur(8px);
 }
 
 .nav a {
@@ -24,8 +28,8 @@
 }
 
 .nav a.active {
-  background: #111;
-  border-color: #111;
+  background: #111111;
+  border-color: #111111;
   color: #fff;
 }
 

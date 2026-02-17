@@ -36,7 +36,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.renderMap();
+    this.initMap();
     this.renderRankingChart();
     this.renderTrendChart();
   }
@@ -98,15 +98,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   private renderMap(): void {
     const container = document.getElementById('latam-map');
-    if (!container || !this.mapa.length) {
+    if (!container || !this.map) {
       return;
-    }
-
-    if (!this.map) {
-      this.map = L.map(container).setView([-15, -65], 3);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-      }).addTo(this.map);
     }
 
     this.map.eachLayer((layer) => {
@@ -124,6 +117,18 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         .bindPopup(`<b>${item.nombre}</b><br/>IRPC: ${item.indice_compuesto}<br/>Nivel: ${item.nivel_riesgo}`)
         .addTo(this.map);
     }
+    setTimeout(() => this.map?.invalidateSize(), 0);
+  }
+
+  private initMap(): void {
+    const container = document.getElementById('latam-map');
+    if (!container || this.map) return;
+    this.map = L.map(container).setView([-15, -65], 3);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(this.map);
+    setTimeout(() => this.map?.invalidateSize(), 0);
+    this.renderMap();
   }
 
   private renderRankingChart(): void {

@@ -9,6 +9,7 @@
   height: 420px;
   border-radius: 8px;
   overflow: hidden;
+  border: 1px solid var(--border);
 }
 
 .trend-filters {
@@ -44,6 +45,11 @@
   border-bottom: 1px solid #ddd;
   text-align: left;
   padding: 8px;
+}
+
+canvas {
+  width: 100% !important;
+  max-height: 360px;
 }
 
 .error {
