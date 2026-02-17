@@ -1,25 +1,27 @@
 .nav {
   display: flex;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 8px;
+  padding: 8px 10px;
   border: 1px solid var(--border);
-  background: var(--surface);
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.82);
+  border-radius: 14px;
   align-items: center;
   flex-wrap: wrap;
   position: sticky;
-  top: 10px;
+  top: 12px;
   z-index: 40;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 14px rgba(15, 23, 42, 0.05);
 }
 
 .nav a {
   text-decoration: none;
   color: var(--fg);
   border: 1px solid transparent;
-  padding: 7px 10px;
+  padding: 6px 10px;
   border-radius: 10px;
   font-weight: 500;
+  font-size: 0.93rem;
 }
 
 .nav a:hover {
@@ -51,6 +53,9 @@
   border-color: #dc2626;
   background: #dc2626;
   color: #fff;
+  min-height: 34px;
+  padding: 6px 11px;
+  font-size: 0.9rem;
 }
 
 .btn-danger:hover {

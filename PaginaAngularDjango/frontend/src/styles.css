@@ -7,18 +7,20 @@
 @import '@fontsource/geist-mono/400.css';
 
 :root {
-  --bg: #fafafa;
+  --bg: #fcfcfd;
   --surface: #ffffff;
-  --surface-2: #f7f7f8;
+  --surface-2: #f8f8fa;
   --fg: #111111;
-  --muted-fg: #666;
-  --border: #ebebed;
-  --hover: #f5f5f7;
+  --muted-fg: #6b7280;
+  --border: #e7e7eb;
+  --hover: #f4f4f6;
   --success: #0f9d58;
   --warning: #d97706;
   --danger: #dc2626;
-  --radius: 12px;
-  --shadow: 0 1px 1px rgba(0, 0, 0, 0.02), 0 10px 22px rgba(0, 0, 0, 0.04);
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 12px 30px rgba(16, 24, 40, 0.06);
+  --ring: 0 0 0 3px rgba(17, 17, 17, 0.12);
+  --content-max: 1120px;
 }
 
 html,
@@ -32,9 +34,13 @@ body {
     BlinkMacSystemFont,
     sans-serif;
   background:
-    radial-gradient(1400px 600px at 50% -300px, #ececec 0%, transparent 60%),
+    radial-gradient(1000px 500px at 85% -180px, #eceef3 0%, transparent 65%),
+    radial-gradient(900px 420px at -10% -240px, #f2f4f8 0%, transparent 70%),
     var(--bg);
   color: var(--fg);
+  line-height: 1.45;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
 }
 
 * {
@@ -43,24 +49,33 @@ body {
 
 a {
   color: #0f172a;
+  text-underline-offset: 2px;
 }
 
 a:hover {
   color: #000;
+  text-decoration-color: #000;
 }
 
 h1,
 h2,
 h3 {
   letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-top: 0;
 }
 
 mat-card,
 .card {
   border: 1px solid var(--border) !important;
   border-radius: var(--radius) !important;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.01), var(--shadow) !important;
+  box-shadow: var(--shadow) !important;
   background: var(--surface) !important;
+  overflow: hidden;
+}
+
+mat-card {
+  padding: 4px 2px;
 }
 
 button,
@@ -80,6 +95,7 @@ a.btn {
   text-decoration: none;
   cursor: pointer;
   transition: all 0.15s ease;
+  letter-spacing: -0.01em;
 }
 
 button:hover:not([disabled]),
@@ -93,8 +109,8 @@ a.btn:hover {
 button:focus-visible,
 .btn:focus-visible,
 a.btn:focus-visible {
-  outline: 2px solid #2563eb;
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--ring);
 }
 
 button[disabled],
@@ -112,14 +128,15 @@ textarea {
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 10px 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
   outline: none;
-  border-color: #7c8a9a;
-  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+  border-color: #111;
+  box-shadow: var(--ring);
 }
 
 .table {
@@ -140,6 +157,12 @@ textarea:focus {
   border-bottom: 1px solid var(--border);
   text-align: left;
   padding: 10px 12px;
+  font-size: 0.95rem;
+}
+
+.table th {
+  color: #374151;
+  font-weight: 600;
 }
 
 .table tr:hover td {
@@ -153,9 +176,10 @@ textarea:focus {
 
 .kpis mat-card p,
 .kpis .card p {
-  font-size: 1.5rem;
+  font-size: 1.65rem;
   font-weight: 700;
   margin: 0;
+  font-variant-numeric: tabular-nums;
 }
 
 .pager {
@@ -169,4 +193,31 @@ textarea:focus {
   body {
     font-size: 15px;
   }
+}
+
+/* Angular Material harmony overrides (closer to Vercel neutral style) */
+.mat-mdc-raised-button.mat-primary {
+  --mdc-protected-button-container-color: #111111;
+  --mdc-protected-button-label-text-color: #ffffff;
+}
+
+.mat-mdc-unelevated-button.mat-primary {
+  --mdc-filled-button-container-color: #111111;
+  --mdc-filled-button-label-text-color: #ffffff;
+}
+
+.mat-mdc-outlined-button {
+  border-color: var(--border) !important;
+}
+
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+.mat-mdc-form-field-subscript-wrapper {
+  margin-top: 2px;
+}
+
+.mdc-text-field--outlined {
+  border-radius: 12px !important;
 }
