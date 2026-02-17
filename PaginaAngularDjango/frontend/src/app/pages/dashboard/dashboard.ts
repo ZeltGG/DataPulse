@@ -22,12 +22,13 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   tendencias: DashboardTendencias | null = null;
 
   tiposIndicador = ['PIB', 'INFLACION', 'DESEMPLEO', 'BALANZA_COMERCIAL', 'DEUDA_PIB', 'PIB_PERCAPITA'];
-  paisesDisponibles = ['CO', 'BR', 'MX', 'AR', 'CL', 'PE', 'EC', 'UY', 'PY', 'PA'];
+  paisesDisponibles = ['CO', 'BR', 'MX', 'AR', 'CL', 'PE', 'EC', 'UY', 'PY', 'PA', 'BO'];
   tipoSeleccionado = 'INFLACION';
   paisesSeleccionados = ['CO', 'BR', 'MX'];
   readonly countryColors: Record<string, string> = {
     CO: '#facc15',
     AR: '#7dd3fc',
+    BO: '#dc2626',
     BR: '#facc15',
     MX: '#16a34a',
     CL: '#ef4444',
@@ -208,6 +209,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    const trendData = this.buildTrendWindow();
     const fg = this.cssVar('--fg', '#111111');
     const muted = this.cssVar('--muted-fg', '#4b5563');
     const border = this.cssVar('--border', '#e5e7eb');
@@ -215,8 +217,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.chartTendencias = new Chart(canvas, {
       type: 'line',
       data: {
-        labels: this.tendencias.years.map((y) => String(y)),
-        datasets: this.tendencias.series.map((s, i) => ({
+        labels: trendData.years.map((y) => String(y)),
+        datasets: trendData.series.map((s) => ({
           label: `${s.pais_nombre} (${s.pais_codigo})`,
           data: s.valores,
           borderColor: this.countryColor(s.pais_codigo),
@@ -239,7 +241,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         },
         scales: {
           x: {
-            ticks: { color: muted },
+            ticks: { color: muted, autoSkip: false, maxRotation: 0 },
             grid: { color: border },
           },
           y: {
@@ -259,6 +261,37 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private cssVar(name: string, fallback: string): string {
     const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
     return value || fallback;
+  }
+
+  private buildTrendWindow(): {
+    years: number[];
+    series: Array<{ pais_codigo: string; pais_nombre: string; valores: Array<number | null> }>;
+  } {
+    if (!this.tendencias) {
+      return { years: [], series: [] };
+    }
+
+    const sourceYears = this.tendencias.years || [];
+    const anchorYear = sourceYears.length ? Math.max(...sourceYears) : new Date().getFullYear();
+    const years = Array.from({ length: 5 }, (_, i) => anchorYear - 4 + i);
+
+    const series = this.tendencias.series.map((serie) => {
+      const byYear = new Map<number, number>();
+      sourceYears.forEach((year, idx) => {
+        const value = serie.valores?.[idx];
+        if (typeof value === 'number') {
+          byYear.set(year, value);
+        }
+      });
+
+      return {
+        pais_codigo: serie.pais_codigo,
+        pais_nombre: serie.pais_nombre,
+        valores: years.map((y) => (byYear.has(y) ? byYear.get(y)! : null)),
+      };
+    });
+
+    return { years, series };
   }
 
   private colorByLevel(level: string): string {

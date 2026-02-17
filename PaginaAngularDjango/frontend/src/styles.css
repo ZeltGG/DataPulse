@@ -33,6 +33,7 @@
   --hover: #1d1d24;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 12px 30px rgba(0, 0, 0, 0.45);
   --ring: 0 0 0 3px rgba(255, 255, 255, 0.16);
+  color-scheme: dark;
 }
 
 html,
@@ -196,12 +197,41 @@ textarea:focus {
   color: #d4d4d8;
 }
 
+[data-theme='dark'] .table td {
+  color: #f4f4f5;
+}
+
 [data-theme='dark'] a {
   color: #f4f4f5;
 }
 
 [data-theme='dark'] a:hover {
   color: #ffffff;
+}
+
+[data-theme='dark'] mat-card,
+[data-theme='dark'] .card,
+[data-theme='dark'] .mat-mdc-card {
+  color: var(--fg) !important;
+}
+
+[data-theme='dark'] .mat-mdc-form-field .mdc-floating-label,
+[data-theme='dark'] .mat-mdc-form-field .mat-mdc-select-value-text,
+[data-theme='dark'] .mat-mdc-input-element,
+[data-theme='dark'] .mat-mdc-select-arrow {
+  color: var(--fg) !important;
+}
+
+[data-theme='dark'] .mat-mdc-select-panel,
+[data-theme='dark'] .mat-mdc-option {
+  background: var(--surface-2) !important;
+  color: var(--fg) !important;
+}
+
+[data-theme='dark'] .mdc-notched-outline__leading,
+[data-theme='dark'] .mdc-notched-outline__notch,
+[data-theme='dark'] .mdc-notched-outline__trailing {
+  border-color: var(--border) !important;
 }
 
 .error {

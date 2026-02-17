@@ -16,6 +16,7 @@ export class CountryFlagComponent {
 
   private readonly svgByIso: Record<string, string> = {
     AR: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 16'><rect width='24' height='16' fill='#74acdf'/><rect y='5.33' width='24' height='5.34' fill='#fff'/><circle cx='12' cy='8' r='1.6' fill='#f6b40e'/></svg>`,
+    BO: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 16'><rect width='24' height='5.33' fill='#d52b1e'/><rect y='5.33' width='24' height='5.34' fill='#fcd116'/><rect y='10.67' width='24' height='5.33' fill='#007934'/><circle cx='12' cy='8' r='1.1' fill='#1f2937'/></svg>`,
     BR: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 16'><rect width='24' height='16' fill='#229e45'/><polygon points='12,2.1 20.5,8 12,13.9 3.5,8' fill='#f8d447'/><circle cx='12' cy='8' r='3.2' fill='#1c3f94'/></svg>`,
     CL: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 16'><rect width='24' height='8' fill='#fff'/><rect y='8' width='24' height='8' fill='#d52b1e'/><rect width='8' height='8' fill='#0039a6'/><circle cx='4' cy='4' r='1.2' fill='#fff'/></svg>`,
     CO: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 16'><rect width='24' height='8' fill='#fcd116'/><rect y='8' width='24' height='4' fill='#003893'/><rect y='12' width='24' height='4' fill='#ce1126'/></svg>`,
