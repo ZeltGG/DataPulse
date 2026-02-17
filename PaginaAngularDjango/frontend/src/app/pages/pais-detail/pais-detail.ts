@@ -41,9 +41,9 @@ export class PaisDetailComponent implements OnInit {
         this.pais = pais;
 
         // ordenar indicadores (más nuevo arriba)
-        this.indicadores = [...(indicadores || [])].sort((a, b) => b.anio - a.anio);
+        this.indicadores = [...(indicadores?.results || [])].sort((a, b) => b.anio - a.anio);
 
-        const serieTipoCambio = Array.isArray(tipoCambio) ? tipoCambio : [];
+        const serieTipoCambio = tipoCambio?.results || [];
         this.tipoCambio = serieTipoCambio.length > 0 ? serieTipoCambio[0] : null;
         this.loading = false;
       },

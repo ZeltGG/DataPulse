@@ -135,6 +135,28 @@ export interface DashboardResumen {
     pais__nombre: string;
     indice_compuesto: number;
     nivel_riesgo: string;
+    variacion: number;
+    tendencia: 'ALZA' | 'BAJA' | 'ESTABLE';
+  }>;
+}
+
+export interface DashboardMapaItem {
+  codigo_iso: string;
+  nombre: string;
+  latitud: number;
+  longitud: number;
+  indice_compuesto: number;
+  nivel_riesgo: 'BAJO' | 'MODERADO' | 'ALTO' | 'CRITICO';
+  color: string;
+}
+
+export interface DashboardTendencias {
+  tipo: string;
+  years: number[];
+  series: Array<{
+    pais_codigo: string;
+    pais_nombre: string;
+    valores: Array<number | null>;
   }>;
 }
 
@@ -160,12 +182,22 @@ export class ApiService {
     return this.http.get<Pais>(`${this.baseUrl}/paises/${codigoISO}/`);
   }
 
-  getPaisIndicadores(codigoISO: string): Observable<IndicadorEconomico[]> {
-    return this.http.get<IndicadorEconomico[]>(`${this.baseUrl}/paises/${codigoISO}/indicadores/`);
+  getPaisIndicadores(codigoISO: string, params?: { tipo?: string; anio?: number; page?: number; pageSize?: number }): Observable<PaginatedResponse<IndicadorEconomico>> {
+    let httpParams = new HttpParams();
+    if (params?.tipo) httpParams = httpParams.set('tipo', params.tipo);
+    if (params?.anio) httpParams = httpParams.set('anio', String(params.anio));
+    if (params?.page) httpParams = httpParams.set('page', String(params.page));
+    if (params?.pageSize) httpParams = httpParams.set('page_size', String(params.pageSize));
+    return this.http.get<PaginatedResponse<IndicadorEconomico>>(`${this.baseUrl}/paises/${codigoISO}/indicadores/`, { params: httpParams });
   }
 
-  getPaisTipoCambio(codigoISO: string): Observable<TipoCambio[]> {
-    return this.http.get<TipoCambio[]>(`${this.baseUrl}/paises/${codigoISO}/tipo-cambio/`);
+  getPaisTipoCambio(codigoISO: string, params?: { start?: string; end?: string; page?: number; pageSize?: number }): Observable<PaginatedResponse<TipoCambio>> {
+    let httpParams = new HttpParams();
+    if (params?.start) httpParams = httpParams.set('start', params.start);
+    if (params?.end) httpParams = httpParams.set('end', params.end);
+    if (params?.page) httpParams = httpParams.set('page', String(params.page));
+    if (params?.pageSize) httpParams = httpParams.set('page_size', String(params.pageSize));
+    return this.http.get<PaginatedResponse<TipoCambio>>(`${this.baseUrl}/paises/${codigoISO}/tipo-cambio/`, { params: httpParams });
   }
 
   syncPaises(): Observable<unknown> {
@@ -178,6 +210,11 @@ export class ApiService {
 
   getPortafolios(): Observable<PaginatedResponse<Portafolio>> {
     return this.http.get<PaginatedResponse<Portafolio>>(`${this.baseUrl}/portafolios/`);
+  }
+
+  validatePortafolioNombre(nombre: string): Observable<{ unique: boolean; detail?: string }> {
+    const params = new HttpParams().set('nombre', nombre);
+    return this.http.get<{ unique: boolean; detail?: string }>(`${this.baseUrl}/portafolios/validate-nombre/`, { params });
   }
 
   getPortafolio(id: number): Observable<Portafolio> {
@@ -200,6 +237,10 @@ export class ApiService {
     return this.http.get(`${this.baseUrl}/portafolios/${id}/resumen/`);
   }
 
+  exportPortafolioPdf(id: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/portafolios/${id}/export/pdf/`, { responseType: 'blob' });
+  }
+
   createPosicion(portafolioId: number, payload: PosicionCreate): Observable<Posicion> {
     return this.http.post<Posicion>(`${this.baseUrl}/portafolios/${portafolioId}/posiciones/`, payload);
   }
@@ -212,16 +253,25 @@ export class ApiService {
     return this.http.delete(`${this.baseUrl}/portafolios/${portafolioId}/posiciones/${posicionId}/`);
   }
 
-  getRiesgoRanking(): Observable<Riesgo[]> {
-    return this.http.get<Riesgo[]>(`${this.baseUrl}/riesgo/`);
+  getRiesgoRanking(params?: { page?: number; pageSize?: number; ordering?: string }): Observable<PaginatedResponse<Riesgo>> {
+    let httpParams = new HttpParams();
+    if (params?.page) httpParams = httpParams.set('page', String(params.page));
+    if (params?.pageSize) httpParams = httpParams.set('page_size', String(params.pageSize));
+    if (params?.ordering) httpParams = httpParams.set('ordering', params.ordering);
+    return this.http.get<PaginatedResponse<Riesgo>>(`${this.baseUrl}/riesgo/`, { params: httpParams });
   }
 
   getRiesgoPais(codigoISO: string): Observable<Riesgo> {
     return this.http.get<Riesgo>(`${this.baseUrl}/riesgo/${codigoISO}/`);
   }
 
-  getRiesgoHistorico(codigoISO: string): Observable<Riesgo[]> {
-    return this.http.get<Riesgo[]>(`${this.baseUrl}/riesgo/${codigoISO}/historico/`);
+  getRiesgoHistorico(codigoISO: string, params?: { start?: string; end?: string; page?: number; pageSize?: number }): Observable<PaginatedResponse<Riesgo>> {
+    let httpParams = new HttpParams();
+    if (params?.start) httpParams = httpParams.set('start', params.start);
+    if (params?.end) httpParams = httpParams.set('end', params.end);
+    if (params?.page) httpParams = httpParams.set('page', String(params.page));
+    if (params?.pageSize) httpParams = httpParams.set('page_size', String(params.pageSize));
+    return this.http.get<PaginatedResponse<Riesgo>>(`${this.baseUrl}/riesgo/${codigoISO}/historico/`, { params: httpParams });
   }
 
   recalcularRiesgo(): Observable<unknown> {
@@ -230,6 +280,16 @@ export class ApiService {
 
   getDashboardResumen(): Observable<DashboardResumen> {
     return this.http.get<DashboardResumen>(`${this.baseUrl}/dashboard/resumen/`);
+  }
+
+  getDashboardMapa(): Observable<DashboardMapaItem[]> {
+    return this.http.get<DashboardMapaItem[]>(`${this.baseUrl}/dashboard/mapa/`);
+  }
+
+  getDashboardTendencias(tipo = 'INFLACION', paises: string[] = []): Observable<DashboardTendencias> {
+    let params = new HttpParams().set('tipo', tipo);
+    if (paises.length) params = params.set('paises', paises.join(','));
+    return this.http.get<DashboardTendencias>(`${this.baseUrl}/dashboard/tendencias/`, { params });
   }
 
   getAlertas(params?: { tipo?: string; severidad?: string; leida?: 'true' | 'false' }): Observable<PaginatedResponse<Alerta>> {

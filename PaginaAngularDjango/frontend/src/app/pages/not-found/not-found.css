@@ -1,0 +1,9 @@
+.nf {
+  text-align: center;
+  padding: 48px 12px;
+}
+
+.nf h1 {
+  font-size: 3rem;
+  margin-bottom: 8px;
+}

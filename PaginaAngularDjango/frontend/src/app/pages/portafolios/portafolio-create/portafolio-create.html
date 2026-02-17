@@ -6,7 +6,8 @@
   <form [formGroup]="form" (ngSubmit)="submit()" class="form">
     <mat-form-field appearance="outline">
       <mat-label>Nombre</mat-label>
-      <input matInput formControlName="nombre" />
+      <input matInput formControlName="nombre" (blur)="onNombreBlur()" />
+      <mat-error *ngIf="form.controls.nombre.hasError('notUnique')">Ya existe un portafolio con ese nombre.</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -20,6 +21,7 @@
     <button mat-raised-button color="primary" type="submit" [disabled]="loading || form.invalid">
       {{ loading ? 'Creando...' : 'Crear' }}
     </button>
+    <p *ngIf="checkingName">Validando nombre...</p>
 
     <p *ngIf="error" class="error">{{ error }}</p>
   </form>

@@ -31,6 +31,7 @@ export class PortafolioCreateComponent {
   private readonly fb = inject(FormBuilder);
 
   loading = false;
+  checkingName = false;
   error = '';
 
   form = this.fb.nonNullable.group({
@@ -40,6 +41,26 @@ export class PortafolioCreateComponent {
   });
 
   constructor(private api: ApiService, private router: Router) {}
+
+  onNombreBlur(): void {
+    const control = this.form.controls.nombre;
+    const value = control.value?.trim();
+    if (!value || control.invalid) return;
+    this.checkingName = true;
+    this.api
+      .validatePortafolioNombre(value)
+      .pipe(finalize(() => (this.checkingName = false)))
+      .subscribe({
+        next: (res) => {
+          if (!res.unique) {
+            control.setErrors({ ...(control.errors || {}), notUnique: true });
+          } else if (control.errors?.['notUnique']) {
+            const { notUnique, ...rest } = control.errors;
+            control.setErrors(Object.keys(rest).length ? rest : null);
+          }
+        },
+      });
+  }
 
   submit(): void {
     this.error = '';

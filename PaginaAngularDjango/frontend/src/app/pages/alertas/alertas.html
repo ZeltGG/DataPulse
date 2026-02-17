@@ -1,6 +1,26 @@
 <h1>Alertas</h1>
 
-<button type="button" (click)="markAll()">Marcar todas como leidas</button>
+<div class="filters">
+  <select [(ngModel)]="tipo" (ngModelChange)="load()">
+    <option value="">Tipo: Todos</option>
+    <option value="RIESGO">RIESGO</option>
+    <option value="TIPO_CAMBIO">TIPO_CAMBIO</option>
+    <option value="INDICADOR">INDICADOR</option>
+  </select>
+  <select [(ngModel)]="severidad" (ngModelChange)="load()">
+    <option value="">Severidad: Todas</option>
+    <option value="INFO">INFO</option>
+    <option value="WARNING">WARNING</option>
+    <option value="CRITICAL">CRITICAL</option>
+  </select>
+  <select [(ngModel)]="leida" (ngModelChange)="load()">
+    <option value="">Estado: Todas</option>
+    <option value="false">No leidas</option>
+    <option value="true">Leidas</option>
+  </select>
+  <button type="button" (click)="clearFilters()">Limpiar filtros</button>
+  <button type="button" (click)="markAll()">Marcar todas como leidas</button>
+</div>
 
 <p *ngIf="loading">Cargando...</p>
 <p *ngIf="error" class="error">{{ error }}</p>
@@ -9,7 +29,7 @@
   <li *ngFor="let alerta of items" [class.unread]="!alerta.leida">
     <header>
       <strong>{{ alerta.titulo }}</strong>
-      <span>{{ alerta.severidad }}</span>
+      <span class="sev" [class.info]="alerta.severidad==='INFO'" [class.warning]="alerta.severidad==='WARNING'" [class.critical]="alerta.severidad==='CRITICAL'">{{ alerta.severidad }}</span>
     </header>
     <p>{{ alerta.mensaje }}</p>
     <small>{{ alerta.fecha_creacion | date : 'short' }}</small>

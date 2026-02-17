@@ -66,5 +66,9 @@ export const routes: Routes = [
     data: { roles: ['ANALISTA', 'ADMIN'] },
     loadComponent: () => import('./pages/portafolios/posicion-create/posicion-create').then((m) => m.PosicionCreateComponent),
   },
-  { path: '**', redirectTo: 'dashboard' },
+  {
+    path: '404',
+    loadComponent: () => import('./pages/not-found/not-found').then((m) => m.NotFoundComponent),
+  },
+  { path: '**', redirectTo: '404' },
 ];

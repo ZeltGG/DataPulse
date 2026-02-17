@@ -11,6 +11,29 @@
   overflow: hidden;
 }
 
+.trend-filters {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.trend-filters label {
+  font-weight: 600;
+}
+
+.checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.checkboxes label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;

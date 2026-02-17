@@ -32,12 +32,37 @@
   <canvas id="riesgo-chart"></canvas>
 </mat-card>
 
+<mat-card *ngIf="!loading" style="margin-bottom: 16px;">
+  <h2>Tendencias (ultimos 5 anos)</h2>
+  <div class="trend-filters">
+    <label>
+      Indicador
+      <select [(ngModel)]="tipoSeleccionado" (ngModelChange)="loadTendencias()">
+        <option *ngFor="let tipo of tiposIndicador" [value]="tipo">{{ tipo }}</option>
+      </select>
+    </label>
+    <div class="checkboxes">
+      <label *ngFor="let iso of paisesDisponibles">
+        <input
+          type="checkbox"
+          [checked]="paisesSeleccionados.includes(iso)"
+          (change)="onPaisToggle(iso, $any($event.target).checked)"
+        />
+        {{ iso }}
+      </label>
+    </div>
+  </div>
+  <canvas id="tendencias-chart"></canvas>
+</mat-card>
+
 <table *ngIf="resumen && !loading" class="table">
   <thead>
     <tr>
       <th>Pais</th>
       <th>IRPC</th>
       <th>Nivel</th>
+      <th>Variacion</th>
+      <th>Tendencia</th>
     </tr>
   </thead>
   <tbody>
@@ -45,6 +70,8 @@
       <td>{{ row.pais__nombre }} ({{ row.pais__codigo_iso }})</td>
       <td>{{ row.indice_compuesto }}</td>
       <td>{{ row.nivel_riesgo }}</td>
+      <td>{{ row.variacion }}</td>
+      <td>{{ row.tendencia }}</td>
     </tr>
   </tbody>
 </table>

@@ -7,8 +7,29 @@
   <h1>{{ item.nombre }}</h1>
   <p class="desc">{{ item.descripcion || 'Sin descripcion' }}</p>
 
+  <div class="actions">
+    <button *ngIf="canWrite" type="button" (click)="editPortafolio()">Editar portafolio</button>
+    <button type="button" (click)="exportPdf()">Exportar PDF</button>
+  </div>
+
   <div *ngIf="canWrite" class="actions">
     <a [routerLink]="['/portafolios', item.id, 'posiciones', 'new']">+ Crear posicion</a>
+  </div>
+
+  <div class="metrics" *ngIf="resumen">
+    <div><strong>Monto total:</strong> {{ resumen.monto_total }}</div>
+    <div><strong>Riesgo promedio:</strong> {{ resumen.riesgo_promedio }}</div>
+  </div>
+
+  <div class="charts" *ngIf="resumen">
+    <div>
+      <h3>Distribucion por pais</h3>
+      <canvas id="dist-pais-chart"></canvas>
+    </div>
+    <div>
+      <h3>Distribucion por tipo activo</h3>
+      <canvas id="dist-tipo-chart"></canvas>
+    </div>
   </div>
 
   <hr />
@@ -42,10 +63,17 @@
         <td *ngIf="canWrite">
           <button
             type="button"
-            (click)="deletePosicion(posicion.id)"
-            [disabled]="deletingPosicionId === posicion.id"
+            (click)="editPosicion(posicion.id)"
+            [disabled]="editingPosicionId === posicion.id || deletingPosicionId === posicion.id"
           >
-            {{ deletingPosicionId === posicion.id ? 'Eliminando...' : 'Eliminar' }}
+            {{ editingPosicionId === posicion.id ? 'Guardando...' : 'Editar' }}
+          </button>
+          <button
+            type="button"
+            (click)="deletePosicion(posicion.id)"
+            [disabled]="deletingPosicionId === posicion.id || editingPosicionId === posicion.id"
+          >
+            {{ deletingPosicionId === posicion.id ? 'Cerrando...' : 'Cerrar' }}
           </button>
         </td>
       </tr>

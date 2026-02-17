@@ -37,10 +37,11 @@ export class PosicionCreateComponent implements OnInit {
     pais: [0, [Validators.required]],
     activo: ['', [Validators.required]],
     ticker: [''],
-    tipo_activo: ['ACCION', [Validators.required]],
+    tipo_activo: ['RENTA_VARIABLE', [Validators.required]],
     moneda: ['USD', [Validators.required]],
     cantidad: [0, [Validators.required, Validators.min(0.0001)]],
     precio_unitario: [0, [Validators.required, Validators.min(0.0001)]],
+    fecha_entrada: ['', [Validators.required]],
     peso_porcentual: [null as number | null],
     notas: ['', [Validators.maxLength(200)]],
   });
@@ -48,6 +49,7 @@ export class PosicionCreateComponent implements OnInit {
   loading = false;
   loadingPaises = true;
   error = '';
+  montoInversion = 0;
 
   constructor(
     private api: ApiService,
@@ -70,6 +72,11 @@ export class PosicionCreateComponent implements OnInit {
         this.loadingPaises = false;
       },
     });
+    this.form.valueChanges.subscribe(() => {
+      const cantidad = Number(this.form.controls.cantidad.value || 0);
+      const precio = Number(this.form.controls.precio_unitario.value || 0);
+      this.montoInversion = cantidad * precio;
+    });
   }
 
   submit(): void {
@@ -88,6 +95,17 @@ export class PosicionCreateComponent implements OnInit {
     this.loading = true;
 
     const payload = this.form.getRawValue();
+    const today = new Date().toISOString().slice(0, 10);
+    if (payload.fecha_entrada > today) {
+      this.error = 'La fecha de entrada no puede ser futura.';
+      this.loading = false;
+      return;
+    }
+    if (this.montoInversion < 1000 || this.montoInversion > 10000000) {
+      this.error = 'El monto inversion debe estar entre 1,000 y 10,000,000 USD.';
+      this.loading = false;
+      return;
+    }
     if (payload.tipo_activo === 'MONEDA') {
       const pais = this.paises.find((p) => p.id === payload.pais);
       if (pais?.moneda_codigo === 'USD') {
@@ -100,6 +118,7 @@ export class PosicionCreateComponent implements OnInit {
     this.api
       .createPosicion(this.portafolioId, {
         ...payload,
+        monto_inversion_usd: this.montoInversion,
         activo: payload.activo.trim(),
         ticker: payload.ticker.trim(),
       })
