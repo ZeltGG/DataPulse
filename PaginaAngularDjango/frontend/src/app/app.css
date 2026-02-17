@@ -1,0 +1,31 @@
+:host {
+  display: block;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: 24px 20px 36px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.app-header {
+  margin-bottom: 14px;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.app-header p {
+  margin: 8px 0 0;
+  color: var(--muted-fg);
+  font-size: 0.96rem;
+}
+
+.app-main {
+  margin-top: 18px;
+}

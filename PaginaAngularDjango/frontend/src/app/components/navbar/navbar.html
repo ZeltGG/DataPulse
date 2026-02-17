@@ -1,17 +1,17 @@
 <nav class="nav">
-  <a *ngIf="auth.hasAccessToken()" routerLink="/dashboard">Dashboard</a>
+  <a *ngIf="auth.hasAccessToken()" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
 
-  <a *ngIf="auth.hasAccessToken()" routerLink="/paises">Paises</a>
-  <a *ngIf="auth.hasAccessToken()" routerLink="/portafolios">Portafolios</a>
-  <a *ngIf="auth.hasAccessToken()" routerLink="/alertas">
+  <a *ngIf="auth.hasAccessToken()" routerLink="/paises" routerLinkActive="active">Paises</a>
+  <a *ngIf="auth.hasAccessToken()" routerLink="/portafolios" routerLinkActive="active">Portafolios</a>
+  <a *ngIf="auth.hasAccessToken()" routerLink="/alertas" routerLinkActive="active">
     Alertas
-    <span *ngIf="unreadAlerts > 0">({{ unreadAlerts }})</span>
+    <span *ngIf="unreadAlerts > 0" class="badge">{{ unreadAlerts }}</span>
   </a>
-  <a *ngIf="auth.isAdmin()" routerLink="/sync">Sync</a>
+  <a *ngIf="auth.isAdmin()" routerLink="/sync" routerLinkActive="active">Sync</a>
 
   <span class="spacer"></span>
 
-  <a *ngIf="!auth.hasAccessToken()" routerLink="/login">Login</a>
-  <a *ngIf="!auth.hasAccessToken()" routerLink="/register">Register</a>
-  <button *ngIf="auth.hasAccessToken()" (click)="logout()">Logout</button>
+  <a *ngIf="!auth.hasAccessToken()" routerLink="/login" routerLinkActive="active">Login</a>
+  <a *ngIf="!auth.hasAccessToken()" routerLink="/register" routerLinkActive="active">Register</a>
+  <button *ngIf="auth.hasAccessToken()" class="btn-danger" (click)="logout()">Logout</button>
 </nav>

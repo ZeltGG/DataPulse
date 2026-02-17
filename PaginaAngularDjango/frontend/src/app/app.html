@@ -1,7 +1,13 @@
-<h1>DataPulse LATAM</h1>
-
 <app-loading-spinner></app-loading-spinner>
-<app-navbar></app-navbar>
-<main style="padding: 16px;">
-  <router-outlet></router-outlet>
-</main>
+<div class="app-shell">
+  <header class="app-header">
+    <h1>DataPulse LATAM</h1>
+    <p>Plataforma financiera para monitoreo de riesgo y gestion de portafolios.</p>
+  </header>
+
+  <app-navbar></app-navbar>
+
+  <main class="app-main">
+    <router-outlet></router-outlet>
+  </main>
+</div>

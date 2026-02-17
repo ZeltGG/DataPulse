@@ -1,13 +1,55 @@
 .nav {
-    display: flex;
-    gap: 12px;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    align-items: center;
-  }
-  .spacer {
-    flex: 1;
-  }
-  button {
-    cursor: pointer;
-  }
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.nav a {
+  text-decoration: none;
+  color: var(--fg);
+  border: 1px solid transparent;
+  padding: 7px 10px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.nav a:hover {
+  background: var(--hover);
+  border-color: var(--border);
+}
+
+.nav a.active {
+  background: #111;
+  border-color: #111;
+  color: #fff;
+}
+
+.badge {
+  margin-left: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  background: #e11d48;
+  color: #fff;
+  border-radius: 999px;
+  padding: 2px 7px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.btn-danger {
+  border-color: #dc2626;
+  background: #dc2626;
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
