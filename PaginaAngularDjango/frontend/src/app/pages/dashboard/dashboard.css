@@ -5,6 +5,12 @@
   margin-bottom: 18px;
 }
 
+.kpis mat-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(250, 250, 251, 0.9)),
+    var(--surface) !important;
+}
+
 .kpis mat-card h3 {
   color: var(--muted-fg);
   font-size: 0.92rem;
@@ -24,14 +30,20 @@
   display: grid;
   gap: 10px;
   margin-bottom: 14px;
-  background: var(--surface-2);
+  background: linear-gradient(180deg, var(--surface-2), var(--surface));
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 10px;
+  padding: 12px;
 }
 
 .trend-filters label {
   font-weight: 600;
+}
+
+.filters-help {
+  margin: 0;
+  color: var(--muted-fg);
+  font-size: 0.85rem;
 }
 
 .checkboxes {
@@ -41,14 +53,30 @@
 }
 
 .checkboxes label {
+  --chip-color: #cbd5e1;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-weight: 500;
-  background: #fff;
+  background: linear-gradient(180deg, #fff, #f8fafc);
   border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 4px 10px;
+  padding: 6px 11px;
+  transition: all 0.15s ease;
+}
+
+.checkboxes label.selected {
+  border-color: color-mix(in srgb, var(--chip-color) 60%, #111111 40%);
+  background: color-mix(in srgb, var(--chip-color) 20%, #ffffff 80%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chip-color) 55%, #ffffff 45%);
+}
+
+.checkboxes label:hover {
+  transform: translateY(-1px);
+}
+
+.checkboxes input {
+  width: auto;
 }
 
 .table {
@@ -66,6 +94,15 @@
 canvas {
   width: 100% !important;
   max-height: 340px;
+}
+
+.country-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  display: inline-block;
+  margin-right: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.2);
 }
 
 .error {

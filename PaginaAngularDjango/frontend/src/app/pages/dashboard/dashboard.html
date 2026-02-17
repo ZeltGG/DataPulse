@@ -43,8 +43,15 @@
         <option *ngFor="let tipo of tiposIndicador" [value]="tipo">{{ tipo }}</option>
       </select>
     </label>
+    <p class="filters-help">
+      Maximo 3 paises activos. Si agregas un cuarto, se reemplaza automaticamente el mas antiguo.
+    </p>
     <div class="checkboxes">
-      <label *ngFor="let iso of paisesDisponibles">
+      <label
+        *ngFor="let iso of paisesDisponibles"
+        [class.selected]="paisesSeleccionados.includes(iso)"
+        [style.--chip-color]="countryColor(iso)"
+      >
         <input
           type="checkbox"
           [checked]="paisesSeleccionados.includes(iso)"
@@ -70,7 +77,10 @@
   </thead>
   <tbody>
     <tr *ngFor="let row of resumen.ranking">
-      <td>{{ row.pais__nombre }} ({{ row.pais__codigo_iso }})</td>
+      <td>
+        <span class="country-dot" [style.background]="countryColor(row.pais__codigo_iso)"></span>
+        {{ row.pais__nombre }} ({{ row.pais__codigo_iso }})
+      </td>
       <td>{{ row.indice_compuesto }}</td>
       <td>{{ row.nivel_riesgo }}</td>
       <td>{{ row.variacion }}</td>

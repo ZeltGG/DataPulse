@@ -10,6 +10,9 @@
   <a *ngIf="auth.isAdmin()" routerLink="/sync" routerLinkActive="active">Sync</a>
 
   <span class="spacer"></span>
+  <button class="btn-theme" type="button" (click)="toggleTheme()">
+    {{ theme === 'light' ? 'Dark' : 'Light' }}
+  </button>
 
   <a *ngIf="!auth.hasAccessToken()" routerLink="/login" routerLinkActive="active">Login</a>
   <a *ngIf="!auth.hasAccessToken()" routerLink="/register" routerLinkActive="active">Register</a>

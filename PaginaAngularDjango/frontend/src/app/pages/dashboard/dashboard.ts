@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -13,7 +13,7 @@ import { ApiService, DashboardMapaItem, DashboardResumen, DashboardTendencias } 
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
-export class DashboardComponent implements OnInit, AfterViewInit {
+export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   loading = true;
   error = '';
   resumen: DashboardResumen | null = null;
@@ -24,10 +24,26 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   paisesDisponibles = ['CO', 'BR', 'MX', 'AR', 'CL', 'PE', 'EC', 'UY', 'PY', 'PA'];
   tipoSeleccionado = 'INFLACION';
   paisesSeleccionados = ['CO', 'BR', 'MX'];
+  readonly countryColors: Record<string, string> = {
+    CO: '#facc15',
+    AR: '#7dd3fc',
+    BR: '#facc15',
+    MX: '#16a34a',
+    CL: '#ef4444',
+    PE: '#dc2626',
+    EC: '#f59e0b',
+    UY: '#60a5fa',
+    PY: '#22c55e',
+    PA: '#93c5fd',
+  };
 
   private map?: L.Map;
   private chartRanking?: Chart;
   private chartTendencias?: Chart;
+  private readonly onThemeChange = () => {
+    this.renderRankingChart();
+    this.renderTrendChart();
+  };
 
   constructor(private api: ApiService) {}
 
@@ -39,6 +55,11 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.initMap();
     this.renderRankingChart();
     this.renderTrendChart();
+    window.addEventListener('themechange', this.onThemeChange);
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('themechange', this.onThemeChange);
   }
 
   loadAll(): void {
@@ -87,8 +108,12 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   onPaisToggle(iso: string, checked: boolean): void {
     if (checked) {
-      if (!this.paisesSeleccionados.includes(iso) && this.paisesSeleccionados.length < 3) {
-        this.paisesSeleccionados = [...this.paisesSeleccionados, iso];
+      if (!this.paisesSeleccionados.includes(iso)) {
+        if (this.paisesSeleccionados.length >= 3) {
+          this.paisesSeleccionados = [...this.paisesSeleccionados.slice(1), iso];
+        } else {
+          this.paisesSeleccionados = [...this.paisesSeleccionados, iso];
+        }
       }
     } else {
       this.paisesSeleccionados = this.paisesSeleccionados.filter((p) => p !== iso);
@@ -140,6 +165,9 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    const fg = this.cssVar('--fg', '#111111');
+    const muted = this.cssVar('--muted-fg', '#4b5563');
+    const border = this.cssVar('--border', '#e5e7eb');
     this.chartRanking?.destroy();
     this.chartRanking = new Chart(canvas, {
       type: 'bar',
@@ -155,7 +183,20 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       },
       options: {
         responsive: true,
-        plugins: { legend: { display: false } },
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          x: {
+            ticks: { color: muted },
+            grid: { color: border },
+          },
+          y: {
+            ticks: { color: muted },
+            grid: { color: border },
+          },
+        },
+        color: fg,
       },
     });
   }
@@ -166,7 +207,9 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    const palette = ['#2563eb', '#16a34a', '#dc2626'];
+    const fg = this.cssVar('--fg', '#111111');
+    const muted = this.cssVar('--muted-fg', '#4b5563');
+    const border = this.cssVar('--border', '#e5e7eb');
     this.chartTendencias?.destroy();
     this.chartTendencias = new Chart(canvas, {
       type: 'line',
@@ -175,15 +218,46 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         datasets: this.tendencias.series.map((s, i) => ({
           label: `${s.pais_nombre} (${s.pais_codigo})`,
           data: s.valores,
-          borderColor: palette[i % palette.length],
-          backgroundColor: palette[i % palette.length],
+          borderColor: this.countryColor(s.pais_codigo),
+          backgroundColor: this.countryColor(s.pais_codigo),
+          pointBackgroundColor: this.countryColor(s.pais_codigo),
+          pointBorderColor: fg,
+          pointBorderWidth: 1,
           tension: 0.25,
+          borderWidth: 2.5,
         })),
       },
       options: {
         responsive: true,
+        plugins: {
+          legend: {
+            labels: {
+              color: fg,
+            },
+          },
+        },
+        scales: {
+          x: {
+            ticks: { color: muted },
+            grid: { color: border },
+          },
+          y: {
+            ticks: { color: muted },
+            grid: { color: border },
+          },
+        },
+        color: fg,
       },
     });
+  }
+
+  countryColor(iso: string): string {
+    return this.countryColors[iso] || '#64748b';
+  }
+
+  private cssVar(name: string, fallback: string): string {
+    const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return value || fallback;
   }
 
   private colorByLevel(level: string): string {
