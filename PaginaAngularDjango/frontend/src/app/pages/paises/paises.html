@@ -1,6 +1,6 @@
-<h1>Países</h1>
+<h1>Paises</h1>
 
-<div class="toolbar">
+<div class="toolbar cardish">
   <input
     class="search"
     placeholder="Buscar por nombre, ISO o moneda..."
@@ -27,16 +27,18 @@
     <tr>
       <th>ISO</th>
       <th>Nombre</th>
-      <th>Región</th>
+      <th>Region</th>
       <th>Moneda</th>
-      <th>Población</th>
+      <th>Poblacion</th>
       <th></th>
     </tr>
   </thead>
 
   <tbody>
     <tr *ngFor="let p of filtered">
-      <td><b>{{ p.codigo_iso }}</b></td>
+      <td class="iso-cell">
+        <app-country-flag [iso]="p.codigo_iso" [size]="20" [showCode]="true"></app-country-flag>
+      </td>
       <td>{{ p.nombre }}</td>
       <td>{{ p.region }}</td>
       <td>{{ p.moneda_codigo }} - {{ p.moneda_nombre }}</td>
@@ -50,6 +52,6 @@
 
 <div *ngIf="!loading && !error" class="pager">
   <button (click)="goPrev()" [disabled]="!previous">Anterior</button>
-  <span>Página {{ page }}</span>
+  <span>Pagina {{ page }}</span>
   <button (click)="goNext()" [disabled]="!next">Siguiente</button>
 </div>

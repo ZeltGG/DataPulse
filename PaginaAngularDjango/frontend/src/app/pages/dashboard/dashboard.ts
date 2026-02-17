@@ -5,11 +5,12 @@ import { MatCardModule } from '@angular/material/card';
 import { Chart } from 'chart.js/auto';
 import * as L from 'leaflet';
 import { ApiService, DashboardMapaItem, DashboardResumen, DashboardTendencias } from '../../services/api.service';
+import { CountryFlagComponent } from '../../shared/country-flag/country-flag';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatCardModule],
+  imports: [CommonModule, FormsModule, MatCardModule, CountryFlagComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })

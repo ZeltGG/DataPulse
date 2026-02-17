@@ -57,7 +57,7 @@
           [checked]="paisesSeleccionados.includes(iso)"
           (change)="onPaisToggle(iso, $any($event.target).checked)"
         />
-        {{ iso }}
+        <app-country-flag [iso]="iso" [size]="18" context="chip" [showCode]="true"></app-country-flag>
       </label>
     </div>
   </div>
@@ -78,7 +78,7 @@
   <tbody>
     <tr *ngFor="let row of resumen.ranking">
       <td>
-        <span class="country-dot" [style.background]="countryColor(row.pais__codigo_iso)"></span>
+        <app-country-flag [iso]="row.pais__codigo_iso" [size]="20"></app-country-flag>
         {{ row.pais__nombre }} ({{ row.pais__codigo_iso }})
       </td>
       <td>{{ row.indice_compuesto }}</td>

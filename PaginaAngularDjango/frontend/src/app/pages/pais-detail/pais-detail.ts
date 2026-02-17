@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ApiService, Pais, IndicadorEconomico, TipoCambio } from '../../services/api.service';
+import { CountryFlagComponent } from '../../shared/country-flag/country-flag';
 
 @Component({
   selector: 'app-pais-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, CountryFlagComponent],
   templateUrl: './pais-detail.html',
   styleUrl: './pais-detail.css',
 })
@@ -21,7 +22,10 @@ export class PaisDetailComponent implements OnInit {
   indicadores: IndicadorEconomico[] = [];
   tipoCambio: TipoCambio | null = null;
 
-  constructor(private route: ActivatedRoute, private api: ApiService) {}
+  constructor(
+    private route: ActivatedRoute,
+    private api: ApiService
+  ) {}
 
   ngOnInit(): void {
     this.codigoISO = (this.route.snapshot.paramMap.get('codigo') || '').toUpperCase();
@@ -39,8 +43,6 @@ export class PaisDetailComponent implements OnInit {
     }).subscribe({
       next: ({ pais, indicadores, tipoCambio }) => {
         this.pais = pais;
-
-        // ordenar indicadores (más nuevo arriba)
         this.indicadores = [...(indicadores?.results || [])].sort((a, b) => b.anio - a.anio);
 
         const serieTipoCambio = tipoCambio?.results || [];
@@ -49,9 +51,7 @@ export class PaisDetailComponent implements OnInit {
       },
       error: (e) => {
         console.error('Pais detail error', e);
-        this.error =
-          e?.error?.detail ||
-          'No se pudo cargar el detalle del país. Revisa el backend o permisos.';
+        this.error = e?.error?.detail || 'No se pudo cargar el detalle del pais. Revisa el backend o permisos.';
         this.loading = false;
       },
     });

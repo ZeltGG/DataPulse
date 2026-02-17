@@ -1,17 +1,22 @@
-<a class="back" routerLink="/paises">← Volver a países</a>
+<a class="back" routerLink="/paises">Volver a paises</a>
 
-<h1>Detalle País: {{ codigoISO }}</h1>
+<h1 class="title">
+  <app-country-flag [iso]="codigoISO" [size]="34" context="title"></app-country-flag>
+  Detalle Pais: {{ codigoISO }}
+</h1>
 
 <p *ngIf="loading">Cargando...</p>
 <p *ngIf="error" class="error">{{ error }}</p>
 
 <div *ngIf="!loading && !error && pais" class="grid">
-  <!-- Card: info país -->
   <section class="card">
-    <h2>{{ pais.nombre }}</h2>
+    <div class="country-head">
+      <app-country-flag [iso]="pais.codigo_iso" [size]="30" context="title"></app-country-flag>
+      <h2>{{ pais.nombre }}</h2>
+    </div>
 
     <div class="row">
-      <span class="label">Región</span>
+      <span class="label">Region</span>
       <span class="value">{{ pais.region }}</span>
     </div>
 
@@ -21,7 +26,7 @@
     </div>
 
     <div class="row">
-      <span class="label">Población</span>
+      <span class="label">Poblacion</span>
       <span class="value">{{ formatNumber(pais.poblacion) }}</span>
     </div>
 
@@ -31,56 +36,52 @@
     </div>
   </section>
 
-  <!-- Card: tipo de cambio -->
   <section class="card" *ngIf="tipoCambio as fx; else noFx">
-    <h2>Tipo de cambio ({{ fx.moneda_origen }} → {{ fx.moneda_destino }})</h2>
-  
+    <h2>Tipo de cambio ({{ fx.moneda_origen }} -> {{ fx.moneda_destino }})</h2>
+
     <div class="row">
       <span class="label">Tasa</span>
       <span class="value">{{ fx.tasa }}</span>
     </div>
-  
+
     <div class="row">
       <span class="label">Fecha</span>
       <span class="value">{{ fx.fecha }}</span>
     </div>
-  
+
     <div class="row">
-      <span class="label">Variación %</span>
+      <span class="label">Variacion %</span>
       <span class="value">{{ fx.variacion_porcentual }}</span>
     </div>
-  
+
     <div class="row">
       <span class="label">Fuente</span>
       <span class="value">{{ fx.fuente }}</span>
     </div>
   </section>
-  
+
   <ng-template #noFx>
     <section class="card">
       <h2>Tipo de cambio</h2>
-      <p>No hay tipo de cambio registrado para este país.</p>
+      <p>No hay tipo de cambio registrado para este pais.</p>
     </section>
   </ng-template>
 </div>
 
-<!-- Indicadores -->
 <section *ngIf="!loading && !error" class="card full">
-  <h2>Indicadores económicos</h2>
+  <h2>Indicadores economicos</h2>
 
-  <p *ngIf="indicadores.length === 0" class="muted">
-    No hay indicadores registrados para este país.
-  </p>
+  <p *ngIf="indicadores.length === 0" class="muted">No hay indicadores registrados para este pais.</p>
 
   <table *ngIf="indicadores.length > 0" class="table">
     <thead>
       <tr>
-        <th>Año</th>
+        <th>Anio</th>
         <th>Tipo</th>
         <th>Valor</th>
         <th>Unidad</th>
         <th>Fuente</th>
-        <th>Actualización</th>
+        <th>Actualizacion</th>
       </tr>
     </thead>
 

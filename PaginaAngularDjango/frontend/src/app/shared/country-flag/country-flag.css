@@ -1,0 +1,43 @@
+:host {
+  display: inline-flex;
+}
+
+.flag-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.flag {
+  display: inline-block;
+  border-radius: 4px;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+  object-fit: cover;
+}
+
+.flag-wrap.chip .flag {
+  border-radius: 999px;
+}
+
+.flag-wrap.title .flag {
+  border-radius: 6px;
+}
+
+.fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--muted-fg);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.code {
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}

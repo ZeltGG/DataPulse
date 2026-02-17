@@ -1,31 +1,30 @@
 .card {
-    margin-top: 12px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 14px;
-    max-width: 760px;
-  }
-  
-  .desc {
-    opacity: 0.9;
-  }
-  
-  .muted {
-    opacity: 0.7;
-  }
-  
-  .error {
-    color: red;
-  }
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  max-width: 920px;
+  background: linear-gradient(180deg, var(--surface), var(--surface-2));
+}
+
+.desc {
+  color: var(--muted-fg);
+}
+
+.muted {
+  color: var(--muted-fg);
+}
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 10px;
 }
 
 .metrics {
   display: flex;
+  flex-wrap: wrap;
   gap: 18px;
   margin: 10px 0 12px;
 }
@@ -35,6 +34,19 @@
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-bottom: 14px;
+}
+
+.charts > div {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  background: var(--surface);
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 14px 0;
 }
 
 @media (max-width: 900px) {

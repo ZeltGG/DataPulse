@@ -34,10 +34,20 @@
 
 .app-main {
   margin-top: 16px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, #ffffff 8%), var(--surface));
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: var(--shadow);
 }
 
 @media (max-width: 860px) {
   .app-header {
     display: block;
+  }
+
+  .app-main {
+    padding: 14px;
+    border-radius: 14px;
   }
 }

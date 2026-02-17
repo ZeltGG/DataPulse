@@ -3,28 +3,25 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiService, Pais, Region } from '../../services/api.service';
+import { CountryFlagComponent } from '../../shared/country-flag/country-flag';
 
 @Component({
   selector: 'app-paises',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, CountryFlagComponent],
   templateUrl: './paises.html',
   styleUrl: './paises.css',
 })
 export class PaisesComponent implements OnInit {
-  // data
   paises: Pais[] = [];
   filtered: Pais[] = [];
 
-  // ui state
   loading = true;
   error = '';
 
-  // filters
   region: Region | '' = '';
   search = '';
 
-  // pagination (DRF)
   page = 1;
   count = 0;
   next: string | null = null;
@@ -52,12 +49,11 @@ export class PaisesComponent implements OnInit {
           this.next = res.next;
           this.previous = res.previous;
           this.page = page;
-
           this.applyFilters();
           this.loading = false;
         },
         error: () => {
-          this.error = 'No se pudieron cargar los países.';
+          this.error = 'No se pudieron cargar los paises.';
           this.loading = false;
         },
       });

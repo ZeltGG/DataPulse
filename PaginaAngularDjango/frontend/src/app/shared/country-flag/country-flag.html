@@ -1,0 +1,15 @@
+<span class="flag-wrap" [class.chip]="context === 'chip'" [class.title]="context === 'title'">
+  <img
+    *ngIf="src; else fallback"
+    class="flag"
+    [src]="src"
+    [alt]="'Bandera ' + code"
+    [style.width.px]="size"
+    [style.height.px]="(size * 2) / 3"
+    loading="lazy"
+  />
+  <ng-template #fallback>
+    <span class="fallback" [style.width.px]="size" [style.height.px]="(size * 2) / 3">{{ fallbackLabel }}</span>
+  </ng-template>
+  <span *ngIf="showCode" class="code">{{ code }}</span>
+</span>

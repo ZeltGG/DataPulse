@@ -91,18 +91,15 @@
   padding: 8px;
 }
 
+.table td:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 canvas {
   width: 100% !important;
   max-height: 340px;
-}
-
-.country-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  display: inline-block;
-  margin-right: 8px;
-  border: 1px solid rgba(15, 23, 42, 0.2);
 }
 
 .error {
