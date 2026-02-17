@@ -1,17 +1,13 @@
 <nav class="nav">
-    <a routerLink="/projects">Projects</a>
-    <a routerLink="/contact">Contact</a>
-    <a routerLink="/portafolios">Portafolios</a>
-  
-    <!-- Solo usuarios logueados -->
-    <a *ngIf="auth.hasAccessToken()" routerLink="/paises">Países</a>
-  
-    <!-- Solo ADMIN -->
-    <a *ngIf="auth.isAdmin()" routerLink="/sync">Sync</a>
-  
-    <span class="spacer"></span>
-  
-    <!-- Login/Logout -->
-    <a *ngIf="!auth.hasAccessToken()" routerLink="/login">Login</a>
-    <button *ngIf="auth.hasAccessToken()" (click)="logout()">Logout</button>
-  </nav>
+  <a routerLink="/projects">Projects</a>
+  <a routerLink="/contact">Contact</a>
+
+  <a *ngIf="auth.hasAccessToken()" routerLink="/paises">Paises</a>
+  <a *ngIf="auth.hasAccessToken()" routerLink="/portafolios">Portafolios</a>
+  <a *ngIf="auth.isAdmin()" routerLink="/sync">Sync</a>
+
+  <span class="spacer"></span>
+
+  <a *ngIf="!auth.hasAccessToken()" routerLink="/login">Login</a>
+  <button *ngIf="auth.hasAccessToken()" (click)="logout()">Logout</button>
+</nav>

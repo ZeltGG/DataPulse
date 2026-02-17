@@ -1,118 +1,45 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, tap, catchError, map } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { catchError, map, of } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 
-export interface TokenPair {
-  access: string;
-  refresh: string;
-}
+export const authGuard: CanActivateFn = (route) => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
 
-export interface MeResponse {
-  id: number;
-  username: string;
-  is_staff: boolean;
-  is_superuser: boolean;
-  groups: string[];
-}
-
-@Injectable({ providedIn: 'root' })
-export class authGuard {
-  private readonly baseUrl = environment.apiUrl;
-  private readonly ACCESS_KEY = 'dp_access';
-  private readonly REFRESH_KEY = 'dp_refresh';
-
-  
-  private loggedIn$ = new BehaviorSubject<boolean>(this.hasAccessToken());
-
-  
-  private me$ = new BehaviorSubject<MeResponse | null>(null);
-
-  constructor(private http: HttpClient) {}
-
-
-  isLoggedIn(): Observable<boolean> {
-    return this.loggedIn$.asObservable();
+  if (!auth.hasAccessToken()) {
+    router.navigateByUrl('/login');
+    return false;
   }
 
-  hasAccessToken(): boolean {
-    return !!localStorage.getItem(this.ACCESS_KEY);
-  }
+  const allowedRoles = (route.data?.['roles'] as string[] | undefined) || [];
+  const me = auth.getMeSnapshot();
 
-  getAccessToken(): string | null {
-    return localStorage.getItem(this.ACCESS_KEY);
-  }
-
-  getRefreshToken(): string | null {
-    return localStorage.getItem(this.REFRESH_KEY);
-  }
-
- 
-  getMeSnapshot(): MeResponse | null {
-    return this.me$.value;
-  }
-
-  
-  meChanges(): Observable<MeResponse | null> {
-    return this.me$.asObservable();
-  }
-
- 
-  login(username: string, password: string): Observable<TokenPair> {
-    return this.http
-      .post<TokenPair>(`${this.baseUrl}/auth/login/`, { username, password })
-      .pipe(
-        tap((tokens) => {
-          localStorage.setItem(this.ACCESS_KEY, tokens.access);
-          localStorage.setItem(this.REFRESH_KEY, tokens.refresh);
-          this.loggedIn$.next(true);
-        }),
-        
-        tap(() => {
-          this.fetchMe().subscribe();
-        })
-      );
-  }
-
-  refresh(): Observable<{ access: string }> {
-    const refresh = this.getRefreshToken();
-    return this.http.post<{ access: string }>(`${this.baseUrl}/auth/refresh/`, {
-      refresh,
-    });
-  }
-
-  setAccessToken(access: string) {
-    localStorage.setItem(this.ACCESS_KEY, access);
-  }
-
-  logout(): void {
-    localStorage.removeItem(this.ACCESS_KEY);
-    localStorage.removeItem(this.REFRESH_KEY);
-    this.me$.next(null);
-    this.loggedIn$.next(false);
-  }
-
- 
-  fetchMe(): Observable<MeResponse | null> {
-    if (!this.hasAccessToken()) {
-      this.me$.next(null);
-      return of(null);
+  if (me) {
+    if (!allowedRoles.length || auth.hasRole(...allowedRoles)) {
+      return true;
     }
-
-    return this.http.get<MeResponse>(`${this.baseUrl}/auth/me/`).pipe(
-      tap((me) => this.me$.next(me)),
-      map((me) => me),
-      catchError(() => {
-      
-        this.logout();
-        return of(null);
-      })
-    );
+    router.navigateByUrl('/paises');
+    return false;
   }
 
-  initSession(): Observable<MeResponse | null> {
-    const cached = this.getMeSnapshot();
-    if (cached) return of(cached);
-    return this.fetchMe();
-  }
-}
+  return auth.initSession().pipe(
+    map((sessionMe) => {
+      if (!sessionMe) {
+        router.navigateByUrl('/login');
+        return false;
+      }
+
+      if (!allowedRoles.length || auth.hasRole(...allowedRoles)) {
+        return true;
+      }
+
+      router.navigateByUrl('/paises');
+      return false;
+    }),
+    catchError(() => {
+      router.navigateByUrl('/login');
+      return of(false);
+    })
+  );
+};

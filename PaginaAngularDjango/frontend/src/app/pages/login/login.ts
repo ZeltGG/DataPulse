@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
+import { finalize, switchMap } from 'rxjs';
 
 import { AuthService } from '../../services/auth.service';
 
@@ -12,7 +12,7 @@ import { AuthService } from '../../services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './login.html',
-  styleUrl: './login.css',
+  styleUrls: ['./login.css'],
 })
 export class LoginComponent {
   username = '';
@@ -34,7 +34,7 @@ export class LoginComponent {
     const password = this.password.trim();
 
     if (!username || !password) {
-      this.error = 'Completa usuario y contraseña.';
+      this.error = 'Completa usuario y contrasena.';
       return;
     }
 
@@ -42,29 +42,26 @@ export class LoginComponent {
 
     this.auth
       .login(username, password)
-      .pipe(finalize(() => (this.loading = false)))
+      .pipe(
+        switchMap(() => this.auth.me()),
+        finalize(() => (this.loading = false))
+      )
       .subscribe({
-        next: () => {
-          // importante para roles: cachea /auth/me/
-          this.auth.initSession().subscribe({
-            next: () => this.router.navigateByUrl('/paises'),
-            error: () => this.router.navigateByUrl('/paises'),
-          });
-        },
+        next: () => this.router.navigateByUrl('/paises'),
         error: (err: unknown) => {
           if (err instanceof HttpErrorResponse) {
             if (err.status === 401) {
-              this.error = 'Usuario o contraseña incorrectos.';
+              this.error = 'Usuario o contrasena incorrectos.';
               return;
             }
             if (err.status === 0) {
-              this.error = 'No hay conexión con el backend (¿runserver encendido?).';
+              this.error = 'No hay conexion con el backend.';
               return;
             }
-            this.error = `Error ${err.status}: no se pudo iniciar sesión.`;
+            this.error = `Error ${err.status}: no se pudo iniciar sesion.`;
             return;
           }
-          this.error = 'No se pudo iniciar sesión.';
+          this.error = 'No se pudo iniciar sesion.';
         },
       });
   }
