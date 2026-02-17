@@ -1,39 +1,44 @@
 from rest_framework import serializers
+
 from .models import (
-    Project, ContactMessage,
-    Pais, IndicadorEconomico, TipoCambio,
-    Portafolio, Posicion
+    ContactMessage,
+    IndicadorEconomico,
+    Pais,
+    Portafolio,
+    Posicion,
+    Project,
+    TipoCambio,
 )
 
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = "__all__"
+        fields = '__all__'
 
 
 class ContactMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactMessage
-        fields = "__all__"
+        fields = '__all__'
 
 
 class IndicadorEconomicoSerializer(serializers.ModelSerializer):
     class Meta:
         model = IndicadorEconomico
-        fields = "__all__"
+        fields = '__all__'
 
 
 class TipoCambioSerializer(serializers.ModelSerializer):
     class Meta:
         model = TipoCambio
-        fields = "__all__"
+        fields = '__all__'
 
 
 class PaisSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pais
-        fields = "__all__"
+        fields = '__all__'
 
 
 class PaisDetailSerializer(serializers.ModelSerializer):
@@ -41,35 +46,46 @@ class PaisDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Pais
-        fields = "__all__"
+        fields = '__all__'
 
 
 class PosicionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Posicion
-        fields = "__all__"
-        read_only_fields = ("portafolio", "created_at")
+        fields = (
+            'id',
+            'portafolio',
+            'pais',
+            'activo',
+            'ticker',
+            'tipo_activo',
+            'moneda',
+            'cantidad',
+            'precio_unitario',
+            'peso_porcentual',
+            'created_at',
+        )
+        read_only_fields = ('id', 'created_at', 'portafolio')
 
 
 class PortafolioListSerializer(serializers.ModelSerializer):
-    pais_nombre = serializers.CharField(source="pais.nombre", read_only=True)
-    posiciones_count = serializers.IntegerField(source="posiciones.count", read_only=True)
+    posiciones_count = serializers.IntegerField(source='posiciones.count', read_only=True)
 
     class Meta:
         model = Portafolio
-        fields = ("id", "nombre", "descripcion", "pais", "pais_nombre", "activo", "created_at", "updated_at", "posiciones_count")
+        fields = ('id', 'nombre', 'descripcion', 'owner', 'created_at', 'posiciones_count')
 
 
 class PortafolioDetailSerializer(serializers.ModelSerializer):
-    pais_detalle = PaisSerializer(source="pais", read_only=True)
     posiciones = PosicionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Portafolio
-        fields = "__all__"
+        fields = ('id', 'nombre', 'descripcion', 'owner', 'created_at', 'posiciones')
 
 
-class PortafolioCreateSerializer(serializers.ModelSerializer):
+class PortafolioWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Portafolio
-        fields = ("nombre", "descripcion", "pais", "activo")
+        fields = ('id', 'nombre', 'descripcion', 'owner', 'created_at')
+        read_only_fields = ('id', 'owner', 'created_at')
