@@ -1,6 +1,6 @@
 <h1>Portafolios</h1>
 
-<div class="actions" *ngIf="canCreate">
+<div class="actions" *ngIf="canWrite">
   <a class="btn" routerLink="/portafolios/new">+ Crear portafolio</a>
 </div>
 
@@ -8,11 +8,17 @@
 <p *ngIf="error" class="error">{{ error }}</p>
 
 <div class="grid" *ngIf="!loading && !error">
-  <a class="card" *ngFor="let p of items" [routerLink]="['/portafolios', p.id]">
+  <div class="card" *ngFor="let p of items">
     <h3>{{ p.nombre }}</h3>
-    <p class="desc">{{ p.descripcion }}</p>
-    <span class="link">Ver detalle →</span>
-  </a>
+    <p class="desc">{{ p.descripcion || 'Sin descripcion' }}</p>
 
-  <p *ngIf="items.length === 0">No hay portafolios todavía.</p>
+    <div class="card-actions">
+      <a [routerLink]="['/portafolios', p.id]">Ver detalle</a>
+      <button *ngIf="canWrite" type="button" (click)="deletePortafolio(p.id)" [disabled]="deletingId === p.id">
+        {{ deletingId === p.id ? 'Eliminando...' : 'Eliminar' }}
+      </button>
+    </div>
+  </div>
+
+  <p *ngIf="items.length === 0">No hay portafolios todavia.</p>
 </div>

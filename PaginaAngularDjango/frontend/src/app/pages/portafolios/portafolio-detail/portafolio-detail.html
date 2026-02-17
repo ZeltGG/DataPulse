@@ -1,16 +1,56 @@
-<a routerLink="/portafolios">← Volver</a>
+<a routerLink="/portafolios">Volver</a>
 
 <p *ngIf="loading">Cargando...</p>
 <p *ngIf="error" class="error">{{ error }}</p>
 
 <div *ngIf="!loading && !error && item" class="card">
   <h1>{{ item.nombre }}</h1>
-  <p class="desc">{{ item.descripcion }}</p>
+  <p class="desc">{{ item.descripcion || 'Sin descripcion' }}</p>
+
+  <div *ngIf="canWrite" class="actions">
+    <a [routerLink]="['/portafolios', item.id, 'posiciones', 'new']">+ Crear posicion</a>
+  </div>
 
   <hr />
 
   <h2>Posiciones</h2>
-  <p class="muted">
-    (Si tu backend aún no devuelve posiciones aquí, en el siguiente paso las conectamos)
-  </p>
+
+  <table *ngIf="item.posiciones?.length" class="table">
+    <thead>
+      <tr>
+        <th>Activo</th>
+        <th>Ticker</th>
+        <th>Pais</th>
+        <th>Tipo</th>
+        <th>Moneda</th>
+        <th>Cantidad</th>
+        <th>Precio</th>
+        <th>Peso %</th>
+        <th *ngIf="canWrite">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let posicion of item.posiciones">
+        <td>{{ posicion.activo }}</td>
+        <td>{{ posicion.ticker || '-' }}</td>
+        <td>{{ posicion.pais }}</td>
+        <td>{{ posicion.tipo_activo }}</td>
+        <td>{{ posicion.moneda }}</td>
+        <td>{{ posicion.cantidad }}</td>
+        <td>{{ posicion.precio_unitario }}</td>
+        <td>{{ posicion.peso_porcentual ?? '-' }}</td>
+        <td *ngIf="canWrite">
+          <button
+            type="button"
+            (click)="deletePosicion(posicion.id)"
+            [disabled]="deletingPosicionId === posicion.id"
+          >
+            {{ deletingPosicionId === posicion.id ? 'Eliminando...' : 'Eliminar' }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!item.posiciones?.length">No hay posiciones en este portafolio.</p>
 </div>

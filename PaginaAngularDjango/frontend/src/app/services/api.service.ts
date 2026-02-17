@@ -3,7 +3,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-// ---- DRF pagination ----
 export interface PaginatedResponse<T> {
   count: number;
   next: string | null;
@@ -11,7 +10,6 @@ export interface PaginatedResponse<T> {
   results: T[];
 }
 
-// ---- Models ----
 export interface Project {
   id: number;
   title: string;
@@ -64,18 +62,43 @@ export interface TipoCambio {
   fuente: string;
 }
 
-// ---- Portafolios ----
+export interface Posicion {
+  id: number;
+  portafolio: number;
+  pais: number;
+  activo: string;
+  ticker: string;
+  tipo_activo: string;
+  moneda: string;
+  cantidad: number;
+  precio_unitario: number;
+  peso_porcentual: number | null;
+  created_at: string;
+}
+
 export interface Portafolio {
   id: number;
   nombre: string;
   descripcion: string;
-  created_at?: string;
-  updated_at?: string;
+  owner: number | null;
+  created_at: string;
+  posiciones?: Posicion[];
 }
 
 export interface PortafolioCreate {
   nombre: string;
   descripcion: string;
+}
+
+export interface PosicionCreate {
+  pais: number;
+  activo: string;
+  ticker: string;
+  tipo_activo: string;
+  moneda: string;
+  cantidad: number;
+  precio_unitario: number;
+  peso_porcentual?: number | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -84,23 +107,26 @@ export class ApiService {
 
   constructor(private http: HttpClient) {}
 
-  // ---- Projects ----
   getProjects(): Observable<PaginatedResponse<Project>> {
     return this.http.get<PaginatedResponse<Project>>(`${this.baseUrl}/projects/`);
   }
 
-  // ---- Contact ----
-  createContactMessage(payload: ContactMessageCreate): Observable<any> {
+  createContactMessage(payload: ContactMessageCreate): Observable<unknown> {
     return this.http.post(`${this.baseUrl}/contact-messages/`, payload);
   }
 
-  // ---- Países ----
   getPaises(options?: { region?: Region; page?: number; pageSize?: number }): Observable<PaginatedResponse<Pais>> {
     let params = new HttpParams();
 
-    if (options?.region) params = params.set('region', options.region);
-    if (options?.page) params = params.set('page', String(options.page));
-    if (options?.pageSize) params = params.set('page_size', String(options.pageSize));
+    if (options?.region) {
+      params = params.set('region', options.region);
+    }
+    if (options?.page) {
+      params = params.set('page', String(options.page));
+    }
+    if (options?.pageSize) {
+      params = params.set('page_size', String(options.pageSize));
+    }
 
     return this.http.get<PaginatedResponse<Pais>>(`${this.baseUrl}/paises/`, { params });
   }
@@ -117,11 +143,10 @@ export class ApiService {
     return this.http.get<TipoCambio>(`${this.baseUrl}/paises/${codigoISO}/tipo-cambio/`);
   }
 
-  syncPaises(): Observable<any> {
+  syncPaises(): Observable<unknown> {
     return this.http.post(`${this.baseUrl}/sync/paises/`, {});
   }
 
-  // ---- Portafolios ----
   getPortafolios(): Observable<PaginatedResponse<Portafolio>> {
     return this.http.get<PaginatedResponse<Portafolio>>(`${this.baseUrl}/portafolios/`);
   }
@@ -134,7 +159,15 @@ export class ApiService {
     return this.http.post<Portafolio>(`${this.baseUrl}/portafolios/`, payload);
   }
 
-  deletePortafolio(id: number): Observable<any> {
+  deletePortafolio(id: number): Observable<unknown> {
     return this.http.delete(`${this.baseUrl}/portafolios/${id}/`);
+  }
+
+  createPosicion(portafolioId: number, payload: PosicionCreate): Observable<Posicion> {
+    return this.http.post<Posicion>(`${this.baseUrl}/portafolios/${portafolioId}/posiciones/`, payload);
+  }
+
+  deletePosicion(portafolioId: number, posicionId: number): Observable<unknown> {
+    return this.http.delete(`${this.baseUrl}/portafolios/${portafolioId}/posiciones/${posicionId}/`);
   }
 }

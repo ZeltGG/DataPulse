@@ -1,5 +1,7 @@
 <h1>Crear Portafolio</h1>
 
+<a routerLink="/portafolios">Volver</a>
+
 <form (ngSubmit)="submit()" class="form">
   <label>
     Nombre
@@ -7,8 +9,8 @@
   </label>
 
   <label>
-    Descripción
-    <textarea name="descripcion" [(ngModel)]="descripcion" rows="4" required></textarea>
+    Descripcion
+    <textarea name="descripcion" [(ngModel)]="descripcion" rows="4"></textarea>
   </label>
 
   <button type="submit" [disabled]="loading">

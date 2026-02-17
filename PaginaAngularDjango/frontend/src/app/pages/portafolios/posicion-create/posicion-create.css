@@ -1,0 +1,14 @@
+.form {
+  display: grid;
+  gap: 10px;
+  max-width: 480px;
+}
+
+label {
+  display: grid;
+  gap: 4px;
+}
+
+.error {
+  color: #b00020;
+}

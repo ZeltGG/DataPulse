@@ -9,20 +9,49 @@ import { SyncComponent } from './pages/sync/sync';
 import { PortafoliosComponent } from './pages/portafolios/portafolios';
 import { PortafolioDetailComponent } from './pages/portafolios/portafolio-detail/portafolio-detail';
 import { PortafolioCreateComponent } from './pages/portafolios/portafolio-create/portafolio-create';
-
-
-
+import { PosicionCreateComponent } from './pages/portafolios/posicion-create/posicion-create';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'projects', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'projects', component: ProjectsComponent },
   { path: 'contact', component: ContactComponent },
-  { path: 'paises', component: PaisesComponent, canActivate: [authGuard] },
-  { path: 'sync', component: SyncComponent, canActivate: [authGuard] },
-  { path: 'paises/:codigo', component: PaisDetailComponent, canActivate: [authGuard], data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN']} },
-  { path: 'portafolios', component: PortafoliosComponent, canActivate: [authGuard], data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN'] } },
-  { path: 'portafolios/create', component: PortafolioCreateComponent, canActivate: [authGuard], data: { roles: ['ANALISTA', 'ADMIN'] } },
-  { path: 'portafolios/:id', component: PortafolioDetailComponent, canActivate: [authGuard], data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN'] } },
+  { path: 'paises', component: PaisesComponent, canActivate: [authGuard], data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN'] } },
+  {
+    path: 'paises/:codigo',
+    component: PaisDetailComponent,
+    canActivate: [authGuard],
+    data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN'] },
+  },
+  {
+    path: 'sync',
+    component: SyncComponent,
+    canActivate: [authGuard],
+    data: { roles: ['ADMIN'] },
+  },
+  {
+    path: 'portafolios',
+    component: PortafoliosComponent,
+    canActivate: [authGuard],
+    data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN'] },
+  },
+  {
+    path: 'portafolios/new',
+    component: PortafolioCreateComponent,
+    canActivate: [authGuard],
+    data: { roles: ['ANALISTA', 'ADMIN'] },
+  },
+  {
+    path: 'portafolios/:id',
+    component: PortafolioDetailComponent,
+    canActivate: [authGuard],
+    data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN'] },
+  },
+  {
+    path: 'portafolios/:id/posiciones/new',
+    component: PosicionCreateComponent,
+    canActivate: [authGuard],
+    data: { roles: ['ANALISTA', 'ADMIN'] },
+  },
   { path: '**', redirectTo: 'projects' },
 ];
