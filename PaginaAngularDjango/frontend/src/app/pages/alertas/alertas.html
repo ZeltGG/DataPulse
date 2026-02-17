@@ -1,0 +1,18 @@
+<h1>Alertas</h1>
+
+<button type="button" (click)="markAll()">Marcar todas como leidas</button>
+
+<p *ngIf="loading">Cargando...</p>
+<p *ngIf="error" class="error">{{ error }}</p>
+
+<ul class="list" *ngIf="!loading && !error">
+  <li *ngFor="let alerta of items" [class.unread]="!alerta.leida">
+    <header>
+      <strong>{{ alerta.titulo }}</strong>
+      <span>{{ alerta.severidad }}</span>
+    </header>
+    <p>{{ alerta.mensaje }}</p>
+    <small>{{ alerta.fecha_creacion | date : 'short' }}</small>
+    <button *ngIf="!alerta.leida" type="button" (click)="markRead(alerta.id)">Marcar leida</button>
+  </li>
+</ul>

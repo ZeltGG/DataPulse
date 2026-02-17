@@ -73,6 +73,10 @@ export interface Posicion {
   cantidad: number;
   precio_unitario: number;
   peso_porcentual: number | null;
+  monto_inversion_usd: number;
+  fecha_entrada: string;
+  fecha_salida: string | null;
+  notas: string;
   created_at: string;
 }
 
@@ -81,13 +85,17 @@ export interface Portafolio {
   nombre: string;
   descripcion: string;
   owner: number | null;
+  es_publico: boolean;
+  activo: boolean;
   created_at: string;
+  updated_at: string;
   posiciones?: Posicion[];
 }
 
 export interface PortafolioCreate {
   nombre: string;
   descripcion: string;
+  es_publico?: boolean;
 }
 
 export interface PosicionCreate {
@@ -99,6 +107,51 @@ export interface PosicionCreate {
   cantidad: number;
   precio_unitario: number;
   peso_porcentual?: number | null;
+  monto_inversion_usd?: number;
+  fecha_entrada?: string;
+  notas?: string;
+}
+
+export interface Riesgo {
+  id: number;
+  pais: number;
+  pais_codigo: string;
+  pais_nombre: string;
+  fecha_calculo: string;
+  score_economico: number;
+  score_cambiario: number;
+  score_estabilidad: number;
+  indice_compuesto: number;
+  nivel_riesgo: 'BAJO' | 'MODERADO' | 'ALTO' | 'CRITICO';
+  detalle_calculo: Record<string, unknown>;
+}
+
+export interface Alerta {
+  id: number;
+  usuario: number | null;
+  pais: number | null;
+  pais_codigo: string;
+  tipo_alerta: 'RIESGO' | 'TIPO_CAMBIO' | 'INDICADOR';
+  severidad: 'INFO' | 'WARNING' | 'CRITICAL';
+  titulo: string;
+  mensaje: string;
+  leida: boolean;
+  fecha_creacion: string;
+}
+
+export interface DashboardResumen {
+  kpis: {
+    total_paises: number;
+    alertas_activas: number;
+    portafolios_usuario: number;
+    promedio_irpc: number;
+  };
+  ranking: Array<{
+    pais__codigo_iso: string;
+    pais__nombre: string;
+    indice_compuesto: number;
+    nivel_riesgo: string;
+  }>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -115,19 +168,15 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}/contact-messages/`, payload);
   }
 
+  register(payload: { username: string; email: string; password: string; rol: 'ADMIN' | 'ANALISTA' | 'VIEWER' }): Observable<unknown> {
+    return this.http.post(`${this.baseUrl}/auth/register/`, payload);
+  }
+
   getPaises(options?: { region?: Region; page?: number; pageSize?: number }): Observable<PaginatedResponse<Pais>> {
     let params = new HttpParams();
-
-    if (options?.region) {
-      params = params.set('region', options.region);
-    }
-    if (options?.page) {
-      params = params.set('page', String(options.page));
-    }
-    if (options?.pageSize) {
-      params = params.set('page_size', String(options.pageSize));
-    }
-
+    if (options?.region) params = params.set('region', options.region);
+    if (options?.page) params = params.set('page', String(options.page));
+    if (options?.pageSize) params = params.set('page_size', String(options.pageSize));
     return this.http.get<PaginatedResponse<Pais>>(`${this.baseUrl}/paises/`, { params });
   }
 
@@ -139,12 +188,16 @@ export class ApiService {
     return this.http.get<IndicadorEconomico[]>(`${this.baseUrl}/paises/${codigoISO}/indicadores/`);
   }
 
-  getPaisTipoCambio(codigoISO: string): Observable<TipoCambio> {
-    return this.http.get<TipoCambio>(`${this.baseUrl}/paises/${codigoISO}/tipo-cambio/`);
+  getPaisTipoCambio(codigoISO: string): Observable<TipoCambio[]> {
+    return this.http.get<TipoCambio[]>(`${this.baseUrl}/paises/${codigoISO}/tipo-cambio/`);
   }
 
   syncPaises(): Observable<unknown> {
     return this.http.post(`${this.baseUrl}/sync/paises/`, {});
+  }
+
+  syncIndicadores(): Observable<unknown> {
+    return this.http.post(`${this.baseUrl}/paises/sync-indicadores/`, {});
   }
 
   getPortafolios(): Observable<PaginatedResponse<Portafolio>> {
@@ -159,15 +212,67 @@ export class ApiService {
     return this.http.post<Portafolio>(`${this.baseUrl}/portafolios/`, payload);
   }
 
+  updatePortafolio(id: number, payload: Partial<PortafolioCreate>): Observable<Portafolio> {
+    return this.http.put<Portafolio>(`${this.baseUrl}/portafolios/${id}/`, payload);
+  }
+
   deletePortafolio(id: number): Observable<unknown> {
     return this.http.delete(`${this.baseUrl}/portafolios/${id}/`);
+  }
+
+  getPortafolioResumen(id: number): Observable<unknown> {
+    return this.http.get(`${this.baseUrl}/portafolios/${id}/resumen/`);
   }
 
   createPosicion(portafolioId: number, payload: PosicionCreate): Observable<Posicion> {
     return this.http.post<Posicion>(`${this.baseUrl}/portafolios/${portafolioId}/posiciones/`, payload);
   }
 
+  updatePosicion(portafolioId: number, posicionId: number, payload: Partial<PosicionCreate>): Observable<Posicion> {
+    return this.http.put<Posicion>(`${this.baseUrl}/portafolios/${portafolioId}/posiciones/${posicionId}/`, payload);
+  }
+
   deletePosicion(portafolioId: number, posicionId: number): Observable<unknown> {
     return this.http.delete(`${this.baseUrl}/portafolios/${portafolioId}/posiciones/${posicionId}/`);
+  }
+
+  getRiesgoRanking(): Observable<Riesgo[]> {
+    return this.http.get<Riesgo[]>(`${this.baseUrl}/riesgo/`);
+  }
+
+  getRiesgoPais(codigoISO: string): Observable<Riesgo> {
+    return this.http.get<Riesgo>(`${this.baseUrl}/riesgo/${codigoISO}/`);
+  }
+
+  getRiesgoHistorico(codigoISO: string): Observable<Riesgo[]> {
+    return this.http.get<Riesgo[]>(`${this.baseUrl}/riesgo/${codigoISO}/historico/`);
+  }
+
+  recalcularRiesgo(): Observable<unknown> {
+    return this.http.post(`${this.baseUrl}/riesgo/calcular/`, {});
+  }
+
+  getDashboardResumen(): Observable<DashboardResumen> {
+    return this.http.get<DashboardResumen>(`${this.baseUrl}/dashboard/resumen/`);
+  }
+
+  getAlertas(params?: { tipo?: string; severidad?: string; leida?: 'true' | 'false' }): Observable<PaginatedResponse<Alerta>> {
+    let httpParams = new HttpParams();
+    if (params?.tipo) httpParams = httpParams.set('tipo', params.tipo);
+    if (params?.severidad) httpParams = httpParams.set('severidad', params.severidad);
+    if (params?.leida) httpParams = httpParams.set('leida', params.leida);
+    return this.http.get<PaginatedResponse<Alerta>>(`${this.baseUrl}/alertas/`, { params: httpParams });
+  }
+
+  marcarAlertaLeida(id: number): Observable<unknown> {
+    return this.http.put(`${this.baseUrl}/alertas/${id}/leer/`, {});
+  }
+
+  marcarAlertasLeidas(): Observable<unknown> {
+    return this.http.put(`${this.baseUrl}/alertas/leer-todas/`, {});
+  }
+
+  getAlertasResumen(): Observable<unknown> {
+    return this.http.get(`${this.baseUrl}/alertas/resumen/`);
   }
 }

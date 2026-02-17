@@ -1,13 +1,16 @@
 <nav class="nav">
+  <a *ngIf="auth.hasAccessToken()" routerLink="/dashboard">Dashboard</a>
   <a routerLink="/projects">Projects</a>
   <a routerLink="/contact">Contact</a>
 
   <a *ngIf="auth.hasAccessToken()" routerLink="/paises">Paises</a>
   <a *ngIf="auth.hasAccessToken()" routerLink="/portafolios">Portafolios</a>
+  <a *ngIf="auth.hasAccessToken()" routerLink="/alertas">Alertas</a>
   <a *ngIf="auth.isAdmin()" routerLink="/sync">Sync</a>
 
   <span class="spacer"></span>
 
   <a *ngIf="!auth.hasAccessToken()" routerLink="/login">Login</a>
+  <a *ngIf="!auth.hasAccessToken()" routerLink="/register">Register</a>
   <button *ngIf="auth.hasAccessToken()" (click)="logout()">Logout</button>
 </nav>

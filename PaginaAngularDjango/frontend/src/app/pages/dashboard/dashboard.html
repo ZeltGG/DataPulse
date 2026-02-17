@@ -1,0 +1,40 @@
+<h1>Dashboard</h1>
+
+<p *ngIf="loading">Cargando...</p>
+<p *ngIf="error" class="error">{{ error }}</p>
+
+<div *ngIf="resumen && !loading" class="kpis">
+  <article>
+    <h3>Paises</h3>
+    <p>{{ resumen.kpis.total_paises }}</p>
+  </article>
+  <article>
+    <h3>Alertas activas</h3>
+    <p>{{ resumen.kpis.alertas_activas }}</p>
+  </article>
+  <article>
+    <h3>Mis portafolios</h3>
+    <p>{{ resumen.kpis.portafolios_usuario }}</p>
+  </article>
+  <article>
+    <h3>Promedio IRPC</h3>
+    <p>{{ resumen.kpis.promedio_irpc }}</p>
+  </article>
+</div>
+
+<table *ngIf="resumen && !loading" class="table">
+  <thead>
+    <tr>
+      <th>Pais</th>
+      <th>IRPC</th>
+      <th>Nivel</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of resumen.ranking">
+      <td>{{ row.pais__nombre }} ({{ row.pais__codigo_iso }})</td>
+      <td>{{ row.indice_compuesto }}</td>
+      <td>{{ row.nivel_riesgo }}</td>
+    </tr>
+  </tbody>
+</table>

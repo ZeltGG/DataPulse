@@ -1,8 +1,10 @@
-<h1>Sync Países (ADMIN)</h1>
+<h1>Sync Admin</h1>
 
-<button (click)="runSync()" [disabled]="loading">
-  {{ loading ? 'Sincronizando...' : 'Ejecutar Sync' }}
-</button>
+<div class="actions">
+  <button (click)="runSyncPaises()" [disabled]="loading">Sync paises</button>
+  <button (click)="runSyncIndicadores()" [disabled]="loading">Sync indicadores</button>
+  <button (click)="runRecalcularRiesgo()" [disabled]="loading">Recalcular riesgo</button>
+</div>
 
 <p *ngIf="error" style="color:red; margin-top:10px;">{{ error }}</p>
 
