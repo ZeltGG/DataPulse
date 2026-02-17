@@ -25,6 +25,12 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/alertas/alertas').then((m) => m.AlertasComponent),
   },
   {
+    path: 'perfil',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN'] },
+    loadComponent: () => import('./pages/profile/profile').then((m) => m.ProfileComponent),
+  },
+  {
     path: 'paises',
     canActivate: [authGuard, roleGuard],
     data: { roles: ['VIEWER', 'ANALISTA', 'ADMIN'] },

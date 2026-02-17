@@ -7,6 +7,7 @@
     Alertas
     <span *ngIf="unreadAlerts > 0" class="badge">{{ unreadAlerts }}</span>
   </a>
+  <a *ngIf="auth.hasAccessToken()" routerLink="/perfil" routerLinkActive="active">Perfil</a>
   <a *ngIf="auth.isAdmin()" routerLink="/sync" routerLinkActive="active">Sync</a>
 
   <span class="spacer"></span>

@@ -160,6 +160,17 @@ export interface DashboardTendencias {
   }>;
 }
 
+export interface MeProfile {
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  is_staff: boolean;
+  is_superuser: boolean;
+  groups: string[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly baseUrl = environment.apiUrl;
@@ -168,6 +179,14 @@ export class ApiService {
 
   register(payload: { username: string; email: string; password: string; rol: 'ADMIN' | 'ANALISTA' | 'VIEWER' }): Observable<unknown> {
     return this.http.post(`${this.baseUrl}/auth/register/`, payload);
+  }
+
+  getMe(): Observable<MeProfile> {
+    return this.http.get<MeProfile>(`${this.baseUrl}/auth/me/`);
+  }
+
+  updateMe(payload: { email?: string; first_name?: string; last_name?: string }): Observable<MeProfile> {
+    return this.http.put<MeProfile>(`${this.baseUrl}/auth/me/`, payload);
   }
 
   getPaises(options?: { region?: Region; page?: number; pageSize?: number }): Observable<PaginatedResponse<Pais>> {

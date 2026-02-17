@@ -4,6 +4,7 @@ from datetime import date, datetime
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+from django.contrib.auth import get_user_model
 from django.db.models import Avg, Count, Q, Sum
 from django.http import HttpResponse
 from django.utils import timezone
@@ -13,6 +14,8 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import (
     Alerta,
@@ -24,6 +27,24 @@ from .models import (
     Posicion,
     TipoCambio,
 )
+
+User = get_user_model()
+
+
+class EmailOrUsernameTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        login = (attrs.get('username') or '').strip()
+        if login:
+            direct_match = User.objects.filter(username=login).first()
+            if not direct_match:
+                by_email = User.objects.filter(email__iexact=login).first()
+                if by_email:
+                    attrs['username'] = by_email.username
+        return super().validate(attrs)
+
+
+class EmailOrUsernameTokenObtainPairView(TokenObtainPairView):
+    serializer_class = EmailOrUsernameTokenObtainPairSerializer
 from .permissions import IsAdminRole, IsAnalystOrAdmin, IsViewerOrAbove
 from .serializers import (
     AlertaSerializer,
@@ -653,6 +674,8 @@ class MeView(APIView):
                 'id': user.id,
                 'username': user.username,
                 'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
                 'is_staff': user.is_staff,
                 'is_superuser': user.is_superuser,
                 'groups': groups,

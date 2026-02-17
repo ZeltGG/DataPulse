@@ -84,6 +84,17 @@
   border-color: #b91c1c;
 }
 
+[data-theme='dark'] .btn-danger {
+  border-color: #ef4444;
+  background: #ef4444;
+  color: #fff;
+}
+
+[data-theme='dark'] .btn-danger:hover {
+  border-color: #dc2626;
+  background: #dc2626;
+}
+
 .btn-theme {
   min-height: 34px;
   padding: 6px 11px;
@@ -96,4 +107,15 @@
 .btn-theme:hover {
   background: var(--hover);
   border-color: var(--border);
+}
+
+[data-theme='dark'] .btn-theme {
+  border-color: #334155;
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+[data-theme='dark'] .btn-theme:hover {
+  background: #1e293b;
+  border-color: #475569;
 }
