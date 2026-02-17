@@ -88,6 +88,8 @@ Backend API: `http://127.0.0.1:8000/api`
 
 ### Dashboard
 - `GET /api/dashboard/resumen/`
+- `GET /api/dashboard/mapa/`
+- `GET /api/dashboard/tendencias/`
 
 ## Manejo de errores y logs
 - Middleware `api.middleware.RequestLogMiddleware`: log de metodo/path/usuario/duracion/status.
@@ -96,17 +98,34 @@ Backend API: `http://127.0.0.1:8000/api`
 ## Comandos de tareas
 - `python manage.py sync_indicadores`
 - `python manage.py recalcular_riesgo`
+- `python manage.py actualizar_tipo_cambio`
+- `python manage.py seed_data`
 
 ## Pruebas rapidas sugeridas
 - Backend: `python manage.py check`
 - Frontend: `npx tsc --noEmit`
 
 ## Usuarios de prueba
-- `viewer1` (VIEWER)
-- `analista1` (ANALISTA)
-- `user` (ADMIN/superuser)
+- `viewer@datapulse.com` (VIEWER)
+- `analista@datapulse.com` (ANALISTA)
+- `admin@datapulse.com` (ADMIN)
 
-No se publican contrasenas reales en este repositorio.
+Para entorno local de evaluacion, ejecutar `python manage.py seed_data` para generar usuarios y datos.
+No se incluyen contrasenas productivas en este repositorio.
+
+## Checklist QA rapido
+1. Backend
+2. `python manage.py check`
+3. `python manage.py migrate`
+4. `python manage.py seed_data`
+5. `python manage.py runserver 127.0.0.1:8000`
+6. Frontend
+7. `npm install`
+8. `npm run build` o `npm start`
+9. Flujos
+10. Login VIEWER: ver dashboard, paises, portafolios, alertas; no ver sync
+11. Login ANALISTA: crear portafolio y posicion, editar/cerrar posicion, exportar PDF
+12. Login ADMIN: ejecutar sync paises, sync indicadores y recalculo de riesgo
 
 ## Estado de despliegue
 - Base local lista para despliegue.
