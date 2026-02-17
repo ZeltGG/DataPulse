@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -27,6 +27,8 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./login.css'],
 })
 export class LoginComponent {
+  private readonly fb = inject(FormBuilder);
+
   loading = false;
   error = '';
 
@@ -35,7 +37,7 @@ export class LoginComponent {
     password: ['', [Validators.required]],
   });
 
-  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
+  constructor(private auth: AuthService, private router: Router) {
     if (this.auth.hasAccessToken()) {
       this.router.navigateByUrl('/dashboard');
     }

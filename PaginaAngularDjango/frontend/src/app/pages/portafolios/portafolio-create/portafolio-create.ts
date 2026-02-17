@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -28,6 +28,8 @@ import { ApiService } from '../../../services/api.service';
   styleUrl: './portafolio-create.css',
 })
 export class PortafolioCreateComponent {
+  private readonly fb = inject(FormBuilder);
+
   loading = false;
   error = '';
 
@@ -37,7 +39,7 @@ export class PortafolioCreateComponent {
     es_publico: [false],
   });
 
-  constructor(private fb: FormBuilder, private api: ApiService, private router: Router) {}
+  constructor(private api: ApiService, private router: Router) {}
 
   submit(): void {
     this.error = '';

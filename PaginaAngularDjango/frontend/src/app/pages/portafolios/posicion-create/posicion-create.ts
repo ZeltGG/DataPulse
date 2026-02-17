@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -28,6 +28,8 @@ import { ApiService, Pais } from '../../../services/api.service';
   styleUrl: './posicion-create.css',
 })
 export class PosicionCreateComponent implements OnInit {
+  private readonly fb = inject(FormBuilder);
+
   portafolioId = 0;
   paises: Pais[] = [];
 
@@ -48,7 +50,6 @@ export class PosicionCreateComponent implements OnInit {
   error = '';
 
   constructor(
-    private fb: FormBuilder,
     private api: ApiService,
     private route: ActivatedRoute,
     private router: Router
